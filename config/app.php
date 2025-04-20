@@ -123,15 +123,5 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
-    'providers' => [
-
-    /*
-     * Package Service Providers...
-     */
-    Ladumor\LaravelPwa\LaravelPwaServiceProvider::class,
-
-    // otros proveedores...
-    ],
-
 
 ];
