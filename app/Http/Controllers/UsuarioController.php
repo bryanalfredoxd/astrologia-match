@@ -32,7 +32,7 @@ class UsuarioController extends Controller
                     $fail('Debes tener al menos 18 años para registrarte.');
                 }
             }],
-            'genero' => 'required|in:Masculino,Femenino,Otro',
+            'genero' => 'required|in:Masculino,Femenino',
         ]);
     
         Usuario::create([
