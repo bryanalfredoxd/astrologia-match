@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
-    @stack('styles') {{-- Para estilos adicionales en vistas específicas --}}
+    @stack('styles') 
 </head>
 <body>
     @include('layouts.header')
@@ -40,6 +40,6 @@
     </script>
     
 
-    @stack('scripts') {{-- Para scripts adicionales en vistas específicas --}}
+    @stack('scripts')
 </body>
 </html>

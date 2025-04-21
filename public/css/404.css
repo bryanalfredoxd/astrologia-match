@@ -1,0 +1,184 @@
+.cosmic-error-section {
+    background: url('/images/fondo1.jpg') no-repeat center center;
+    background-size: cover;
+    min-height: 89vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.cosmic-error-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+   
+}
+
+.cosmic-error-container {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 2rem;
+}
+
+.cosmic-error-number {
+    font-size: 12rem;
+    font-weight: 900;
+    background: linear-gradient(45deg, var(--accent-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+    margin: 0;
+    text-shadow: 0 0 30px rgba(245, 197, 24, 0.5);
+    animation: pulse 3s infinite alternate;
+}
+
+.comet-icon {
+    font-size: 5rem;
+    background: linear-gradient(45deg, var(--accent-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    margin: -20px 0 20px;
+    animation: cometFly 5s infinite ease-in-out;
+    transform-origin: center;
+}
+
+.cosmic-error-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.cosmic-error-message {
+    font-size: 1.5rem;
+    color: #e0c3fc;
+    max-width: 700px;
+    margin: 0 auto 3rem;
+    line-height: 1.6;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+.cosmic-error-btn {
+    background: linear-gradient(45deg, var(--accent-color), var(--secondary-color));
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    border-radius: 50px;
+    color: var(--dark-color);
+    box-shadow: 0 5px 25px rgba(245, 197, 24, 0.5);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.cosmic-error-btn:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 10px 35px rgba(245, 197, 24, 0.7);
+    color: var(--dark-color);
+}
+
+.cosmic-error-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, var(--secondary-color), var(--accent-color));
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: -1;
+}
+
+.cosmic-error-btn:hover::before {
+    opacity: 1;
+}
+
+.cosmic-links {
+    margin-top: 3rem;
+}
+
+.cosmic-links a {
+    color: var(--accent-color);
+    font-weight: 500;
+    text-decoration: none;
+    margin: 0 15px;
+    transition: all 0.3s ease;
+    position: relative;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.cosmic-links a:hover {
+    color: var(--secondary-color);
+}
+
+.cosmic-links a::after {
+    content: '•';
+    position: absolute;
+    right: -20px;
+    color: var(--primary-color);
+}
+
+.cosmic-links a:last-child::after {
+    display: none;
+}
+
+/* Animations */
+@keyframes pulse {
+    0% { transform: scale(1); text-shadow: 0 0 30px rgba(157, 78, 221, 0.1); }
+    50% { transform: scale(1.05); text-shadow: 0 0 50px rgba(157, 78, 221, 0.1); }
+    100% { transform: scale(1); text-shadow: 0 0 30px rgba(157, 78, 221, 0.1); }
+}
+
+@keyframes cometFly {
+    0% { transform: translateX(-50px) rotate(-45deg); opacity: 0; }
+    20% { transform: translateX(0) rotate(0); opacity: 1; }
+    80% { transform: translateX(0) rotate(0); opacity: 1; }
+    100% { transform: translateX(50px) rotate(45deg); opacity: 0; }
+}
+
+@media (max-width: 768px) {
+    .cosmic-error-number {
+        font-size: 8rem;
+    }
+    
+    .comet-icon {
+        font-size: 4rem;
+        margin: -15px 0 15px;
+    }
+    
+    .cosmic-error-title {
+        font-size: 2rem;
+    }
+    
+    .cosmic-error-message {
+        font-size: 1.2rem;
+        padding: 0 20px;
+    }
+    
+    .cosmic-error-btn {
+        padding: 12px 30px;
+        font-size: 1rem;
+    }
+    
+    .cosmic-links {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .cosmic-links a::after {
+        display: none;
+    }
+}

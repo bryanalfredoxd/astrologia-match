@@ -9,7 +9,7 @@
         <div class="container hero-content" data-aos="fade-up">
             <div class="row justify-content-center">
                 <div class="col-lg-10 text-center">
-                    <h1 class="display-4 fw-bold">Conecta con tu alma gemela... ¡Astrológicamente!</h1>
+                    <h1 class="display-3 fw-bold">Conecta con tu alma gemela ¡Astrológicamente!</h1>
                     <p class="lead">Descubre conexiones profundas basadas en tu carta astral. La química cósmica nunca antes fue tan precisa.</p>
                     <div class="d-flex gap-3 justify-content-center">
                         <a href="{{ route('usuarios.create') }}" class="btn btn-primary btn-lg">
