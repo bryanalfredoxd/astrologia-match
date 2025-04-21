@@ -254,7 +254,7 @@
     <!-- HEADER -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="{{ url('/') }}">
                 <i class="bi bi-stars"></i> AstroMatch
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation">
@@ -263,7 +263,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#">Inicio</a>
+                        <a class="nav-link active" href="{{ url('/') }}">Inicio</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Cómo funciona</a>
@@ -293,11 +293,8 @@
                     <h1 class="display-4 fw-bold">Conecta con tu alma gemela... ¡Astrológicamente!</h1>
                     <p class="lead">Descubre conexiones profundas basadas en tu carta astral. La química cósmica nunca antes fue tan precisa.</p>
                     <div class="d-flex gap-3 justify-content-center">
-                        <a href="#" class="btn btn-primary btn-lg">
+                        <a href="{{ route('usuarios.create') }}" class="btn btn-primary btn-lg">
                             <i class="bi bi-star-fill me-2"></i> Comienza tu viaje
-                        </a>
-                        <a href="#" class="btn btn-outline-light btn-lg">
-                            <i class="bi bi-play-circle me-2"></i> Ver demo
                         </a>
                     </div>
                 </div>
@@ -435,7 +432,7 @@
                     <p class="mb-0">Regístrate ahora y recibe un análisis gratuito de tu carta natal para entender mejor lo que buscas en una relación.</p>
                 </div>
                 <div class="col-lg-4 text-lg-end" data-aos="fade-left">
-                    <a href="#" class="btn btn-primary btn-lg px-4 py-3">
+                    <a href="{{ route('usuarios.create') }}" class="btn btn-primary btn-lg px-4 py-3">
                         <i class="bi bi-arrow-right-circle me-2"></i> Comenzar ahora
                     </a>
                 </div>
