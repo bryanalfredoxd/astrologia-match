@@ -325,6 +325,30 @@
 .cosmic-btn.clicked .bi-stars {
     animation: starShine 0.6s ease-in-out;
 }
+
+/* Estilo para el checkbox inválido */
+.is-invalid {
+    border-color: #dc3545 !important;
+}
+
+.is-invalid ~ .form-check-label {
+    color: #ff6b6b;
+}
+
+.terms-feedback {
+    display: none;
+    font-size: 0.9rem;
+    margin-top: 8px;
+    padding-left: 1.8em;
+    color: #ff6b6b;
+}
+
+/* Estilo para el asterisco de campo requerido */
+.text-danger {
+    color: #ff6b6b !important;
+    font-weight: bold;
+    margin-left: 3px;
+}
 </style>
 @endsection
 
@@ -394,18 +418,18 @@
                                 <div class="form-group password-toggle">
                                     <label for="contrasena" class="form-label">Contraseña</label>
                                     <input type="password" class="form-control" id="contrasena" name="contrasena" required minlength="8">
-                                    <i class="bi bi-eye-slash password-toggle-icon" id="togglePassword"></i>
+                                    <i class="bi password-toggle-icon" id="togglePassword"></i>
                                     <div class="invalid-feedback">
                                         La contraseña debe tener al menos 8 caracteres
                                     </div>
-                                    <small class="form-text">Mínimo 8 caracteres</small>
+                                    
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group password-toggle">
                                     <label for="contrasena_confirmation" class="form-label">Confirmar Contraseña</label>
                                     <input type="password" class="form-control" id="contrasena_confirmation" name="contrasena_confirmation" required>
-                                    <i class="bi bi-eye-slash password-toggle-icon" id="toggleConfirmPassword"></i>
+                                    <i class="bi password-toggle-icon" id="toggleConfirmPassword"></i>
                                     <div class="invalid-feedback">
                                         Las contraseñas deben coincidir
                                     </div>
@@ -421,7 +445,7 @@
                                     <div class="invalid-feedback">
                                         Por favor ingresa tu fecha de nacimiento
                                     </div>
-                                    <small class="form-text">Necesaria para tu carta astral</small>
+                                    
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -445,11 +469,14 @@
                                 <input type="checkbox" class="form-check-input mt-1" id="terms" name="terms" required>
                                 <label class="form-check-label ms-2" for="terms">
                                     Acepto los 
-                                    <a href="#"  class="text-warning text-decoration-underline" target="_blank">Términos y Condiciones</a> 
+                                    <a href="#" class="text-warning text-decoration-underline" target="_blank">Términos y Condiciones</a> 
                                     y la 
                                     <a href="#" class="text-warning text-decoration-underline" target="_blank">Política de Privacidad</a>
-                                    
+                                    <span class="text-danger">*</span>
                                 </label>
+                            </div>
+                            <div class="invalid-feedback terms-feedback">
+                                <i class="bi bi-exclamation-circle-fill me-2"></i>Debes aceptar los términos y condiciones para continuar
                             </div>
                         </div>
                         
@@ -500,10 +527,8 @@
     (function() {
         'use strict';
         
-        // Obtener todos los formularios a los que queremos aplicar estilos de validación de Bootstrap personalizados
         var forms = document.querySelectorAll('.needs-validation');
         
-        // Bucle sobre ellos y evitar el envío
         Array.prototype.slice.call(forms)
             .forEach(function(form) {
                 form.addEventListener('submit', function(event) {
@@ -518,23 +543,23 @@
     })();
 
     // Validación de formulario
-(function() {
-    'use strict';
-    
-    var forms = document.querySelectorAll('.needs-validation');
-    
-    Array.prototype.slice.call(forms)
-        .forEach(function(form) {
-            form.addEventListener('submit', function(event) {
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                
-                form.classList.add('was-validated');
-            }, false);
-        });
-})();
+    (function() {
+        'use strict';
+        
+        var forms = document.querySelectorAll('.needs-validation');
+        
+        Array.prototype.slice.call(forms)
+            .forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    
+                    form.classList.add('was-validated');
+                }, false);
+            });
+    })();
     
     // Inicializar AOS para animaciones
     AOS.init({
@@ -543,8 +568,7 @@
         once: true
     });
 
-    <script>
-document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
     const cosmicBtn = document.querySelector('.cosmic-btn');
     
     if(cosmicBtn) {
@@ -570,7 +594,40 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const termsCheckbox = document.getElementById('terms');
+    const termsFeedback = document.querySelector('.terms-feedback');
+    
+    if(form) {
+        // Validación al enviar el formulario
+        form.addEventListener('submit', function(e) {
+            if(!termsCheckbox.checked) {
+                e.preventDefault();
+                termsCheckbox.classList.add('is-invalid');
+                termsFeedback.style.display = 'block';
+                
+                // Scroll suave al campo no válido
+                termsCheckbox.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        });
+        
+        // Validación en tiempo real
+        termsCheckbox.addEventListener('change', function() {
+            if(this.checked) {
+                this.classList.remove('is-invalid');
+                termsFeedback.style.display = 'none';
+            } else {
+                this.classList.add('is-invalid');
+                termsFeedback.style.display = 'block';
+            }
+        });
+    }
 });
-</script>
 </script>
 @endsection
