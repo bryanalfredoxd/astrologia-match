@@ -7,7 +7,13 @@
 @endsection
 
 @section('content')
-<section style="background: url('/images/fondo1.webp') no-repeat center center; background-size: cover; min-height: 89vh; position: relative; overflow: hidden;" class="register-section">
+<section class="register-section" id="background-section" style="min-height: 89vh; position: relative; overflow: hidden;">
+    <div style="display: none;">
+        <picture>
+            <source srcset="/images/fondo1-mobile.webp" type="image/webp" media="(max-width: 768px)">
+            <source srcset="/images/fondo1.webp" type="image/webp" media="(min-width: 769px)">
+        </picture>
+    </div>
     <div class="container register-container" data-aos="fade-up">
         <div class="row justify-content-center">
             <div class="col-lg-8">
