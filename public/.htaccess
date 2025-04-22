@@ -3,6 +3,14 @@
         Options -MultiViews -Indexes
     </IfModule>
 
+    <IfModule mod_expires.c>
+        ExpiresActive On
+        ExpiresByType image/webp "access plus 1 year"
+        ExpiresByType text/css "access plus 1 month"
+        ExpiresByType application/javascript "access plus 1 month"
+        ExpiresByType application/json "access plus 1 day"
+    </IfModule>
+
     RewriteEngine On
 
     # Handle Authorization Header

@@ -10,4 +10,14 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
+    
 });
+
+// Para Laravel Mix
+mix.js('resources/js/app.js', 'public/js')
+   .postCss('resources/css/app.css', 'public/css', [
+     require('cssnano')({
+       preset: 'default',
+     }),
+   ])
+   .version();

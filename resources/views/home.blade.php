@@ -3,7 +3,9 @@
 @section('title', 'Encuentra tu conexión cósmica')
 
 @section('content')
-
+<picture>
+    <source srcset="/images/fondo1-mobile.webp" type="image/webp" media="(max-width: 768px)">
+</picture>
 <!-- HERO SECTION -->
     <section class="hero-section">
         <div class="container hero-content" data-aos="fade-up">

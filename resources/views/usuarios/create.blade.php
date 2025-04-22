@@ -7,7 +7,7 @@
 @endsection
 
 @section('content')
-<section style="background: url('/images/fondo1.jpg') no-repeat center center; background-size: cover; min-height: 89vh; position: relative; overflow: hidden;" class="register-section">
+<section style="background: url('/images/fondo1.webp') no-repeat center center; background-size: cover; min-height: 89vh; position: relative; overflow: hidden;" class="register-section">
     <div class="container register-container" data-aos="fade-up">
         <div class="row justify-content-center">
             <div class="col-lg-8">
@@ -35,7 +35,7 @@
                         </div>
                     @endif
                     
-                    <form action="{{ route('usuarios.store') }}" method="POST" class="needs-validation" novalidate>
+                    <form action="{{ secure_url('/registrar-usuario') }}" method="POST" class="needs-validation" novalidate>
                         @csrf
                         
                         <div class="row">

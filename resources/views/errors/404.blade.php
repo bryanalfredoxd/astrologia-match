@@ -3,6 +3,7 @@
 @section('title', 'Error cósmico')
 
 <link rel="stylesheet" href="{{ asset('css/404.css') }}">
+<link href="{{ secure_asset('css/404.css') }}" rel="stylesheet">
 
 @section('content')
 <section class="cosmic-error-section d-flex align-items-center justify-content-center py-5">
