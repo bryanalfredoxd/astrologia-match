@@ -11,19 +11,39 @@
     
     <title>@yield('title', 'AstroMatch - Encuentra tu compatibilidad astrológica')</title>
     
+    <!-- Preconexiones para CDNs -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Font Awesome para íconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Manifest para PWA -->
-    <link rel="manifest" href="{{ secure_url('manifest.json') }}" crossorigin="use-credentials">
 
     <!-- Carga Lottie desde CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.4/lottie.min.js"></script>
+
+    <!-- Manifest para PWA -->
+    <link rel="manifest" href="{{ secure_url('manifest.json') }}" crossorigin="use-credentials">
+
     
     <style>
+
+        * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+        /* Añadir estos estilos para prevenir layout shifts y flashes */
+        html, body {
+        width: 100%;
+        height: 100%;
+            overflow-x: hidden;
+            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch;
+        }
         #app-splash {
             position: fixed;
             top: 0;
@@ -154,19 +174,90 @@
     </div>
 
     <!-- Scripts -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Configuración
-            const MAX_DURATION = 5000; // 5 segundos máximo
-            const ANIMATION_SPEED = 2; // Velocidad x2
-            const FADE_DURATION = 500; // 0.5 segundos para el fade
+<script>
+    // Mover las funciones de utilidad al principio
+    function isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    function isPwaInstalled() {
+        return window.matchMedia('(display-mode: standalone)').matches || 
+               window.navigator.standalone ||
+               document.referrer.includes('android-app://');
+    }
+
+    function hideInstallBanner() {
+        const pwaInstallBanner = document.getElementById('pwa-install-banner');
+        pwaInstallBanner.classList.add('hidden');
+        pwaInstallBanner.classList.remove('animate-slide-up');
+    }
+
+    function showInstallBanner() {
+        if (localStorage.getItem('pwaBannerShown') === 'true') return;
+        
+        const pwaInstallBanner = document.getElementById('pwa-install-banner');
+        pwaInstallBanner.classList.remove('hidden');
+        pwaInstallBanner.classList.add('animate-slide-up');
+        
+        setTimeout(hideInstallBanner, 30000);
+    }
+
+    // Cargar el Service Worker de forma no bloqueante
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                navigator.serviceWorker.register('/sw.js').catch(console.error);
+            }, 0);
+        });
+    }
+
+    // Optimización del splash screen
+    document.addEventListener('DOMContentLoaded', function() {
+        const MAX_DURATION = 5000;
+        const ANIMATION_SPEED = 2;
+        const FADE_DURATION = 500;
+        
+        let animationCompleted = false;
+        const startTime = Date.now();
+        const splash = document.getElementById('app-splash');
+        const app = document.getElementById('app');
+        
+        // Prevenir repaints innecesarios
+        splash.style.willChange = 'opacity';
+        app.style.willChange = 'opacity';
+        
+        function hideSplash() {
+            splash.classList.add('splash-fade-out');
+            app.style.display = 'block';
             
-            // Variables de control
-            let animationCompleted = false;
-            let startTime = Date.now();
-            
-            // Carga la animación Lottie
-            var animation = lottie.loadAnimation({
+            // Forzar sincronización de layouts
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    app.classList.add('app-fade-in');
+                    
+                    setTimeout(() => {
+                        splash.style.display = 'none';
+                        splash.style.willChange = 'auto';
+                        app.style.willChange = 'auto';
+                        
+                        if (window.animation) {
+                            window.animation.stop();
+                            window.animation.destroy();
+                            window.animation = null;
+                        }
+                    }, FADE_DURATION);
+                });
+            });
+        }
+        
+        function hideSplashIfReady() {
+            if (animationCompleted || (Date.now() - startTime) >= MAX_DURATION) {
+                hideSplash();
+            }
+        }
+        
+        try {
+            window.animation = lottie.loadAnimation({
                 container: document.getElementById('lottie-animation'),
                 renderer: 'svg',
                 loop: false,
@@ -174,149 +265,84 @@
                 path: '/js/animacion.json'
             });
             
-            // Acelera la animación
-            animation.setSpeed(ANIMATION_SPEED);
-            
-            // Cuando la animación termina
-            animation.addEventListener('complete', function() {
+            window.animation.setSpeed(ANIMATION_SPEED);
+            window.animation.addEventListener('complete', () => {
                 animationCompleted = true;
                 hideSplashIfReady();
             });
             
-            // Por si hay algún error
-            animation.addEventListener('data_failed', function() {
+            window.animation.addEventListener('data_failed', () => {
                 console.error('Error al cargar la animación');
                 hideSplash();
             });
             
-            // Temporizador de duración máxima
             setTimeout(hideSplashIfReady, MAX_DURATION);
-            
-            // Función para ocultar el splash cuando esté listo
-            function hideSplashIfReady() {
-                // Calcula el tiempo transcurrido
-                const elapsed = Date.now() - startTime;
-                
-                // Si la animación ya completó o pasaron los 5 segundos
-                if (animationCompleted || elapsed >= MAX_DURATION) {
-                    hideSplash();
-                }
-            }
-            
-            // Función para ocultar el splash con efecto fade
-            function hideSplash() {
-                const splash = document.getElementById('app-splash');
-                const app = document.getElementById('app');
-                
-                // Aplicamos la clase para el fade out
-                splash.classList.add('splash-fade-out');
-                
-                // Mostramos la app antes del fade para que esté lista
-                app.style.display = 'block';
-                
-                // Aplicamos fade in a la app después de un pequeño delay
-                setTimeout(() => {
-                    app.classList.add('app-fade-in');
-                }, 50);
-                
-                // Eliminamos el splash del DOM después de la transición
-                setTimeout(() => {
-                    splash.style.display = 'none';
-                    
-                    // Detener la animación para liberar recursos
-                    if (animation) {
-                        animation.stop();
-                        animation.destroy();
-                    }
-                }, FADE_DURATION);
-            }
-        });
-
-        // Script para PWA
-        let deferredPrompt;
-        const pwaInstallBanner = document.getElementById('pwa-install-banner');
-        const pwaInstallButton = document.getElementById('pwa-install-button');
-        const pwaInstallCancel = document.getElementById('pwa-install-cancel');
-        
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(function(registration) {
-                        console.log('ServiceWorker registrado con éxito: ', registration.scope);
-                    })
-                    .catch(function(err) {
-                        console.log('Error al registrar ServiceWorker: ', err);
-                    });
-            });
+        } catch (e) {
+            console.error('Error al inicializar animación:', e);
+            hideSplash();
         }
+    });
 
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            console.log('Evento beforeinstallprompt activado');
-            
-            deferredPrompt = e;
-            
-            if (isMobileDevice() && !isPwaInstalled()) {
-                showInstallBanner();
-            }
-        });
+    // Optimización del banner PWA
+    let deferredPrompt;
+    const pwaInstallButton = document.getElementById('pwa-install-button');
+    const pwaInstallCancel = document.getElementById('pwa-install-cancel');
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // Usar requestIdleCallback para tareas no críticas
+        if (typeof requestIdleCallback === 'function') {
+            requestIdleCallback(() => {
+                if (isMobileDevice() && !isPwaInstalled()) {
+                    showInstallBanner();
+                }
+            });
+        } else {
+            setTimeout(() => {
+                if (isMobileDevice() && !isPwaInstalled()) {
+                    showInstallBanner();
+                }
+            }, 1000);
+        }
+    });
 
-        pwaInstallButton.addEventListener('click', (e) => {
+    if (pwaInstallButton) {
+        pwaInstallButton.addEventListener('click', () => {
             hideInstallBanner();
             
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
-                        console.log('Usuario aceptó la instalación');
                         localStorage.setItem('pwaBannerShown', 'true');
-                    } else {
-                        console.log('Usuario rechazó la instalación');
                     }
                     deferredPrompt = null;
                 });
             }
         });
+    }
 
-        pwaInstallCancel.addEventListener('click', (e) => {
+    if (pwaInstallCancel) {
+        pwaInstallCancel.addEventListener('click', () => {
             hideInstallBanner();
             localStorage.setItem('pwaBannerShown', 'true');
             setTimeout(() => {
                 localStorage.removeItem('pwaBannerShown');
             }, 7 * 24 * 60 * 60 * 1000);
         });
+    }
 
-        function showInstallBanner() {
-            if (localStorage.getItem('pwaBannerShown') === 'true') {
-                return;
+    // Verificar PWA instalada después de que todo cargue
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            if (isPwaInstalled()) {
+                console.log('La PWA se está ejecutando en modo standalone');
             }
-            
-            pwaInstallBanner.classList.remove('hidden');
-            pwaInstallBanner.classList.add('animate-slide-up');
-            
-            setTimeout(hideInstallBanner, 30000);
-        }
-
-        function hideInstallBanner() {
-            pwaInstallBanner.classList.add('hidden');
-            pwaInstallBanner.classList.remove('animate-slide-up');
-        }
-
-        function isMobileDevice() {
-            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        }
-
-        function isPwaInstalled() {
-            return window.matchMedia('(display-mode: standalone)').matches || 
-                   window.navigator.standalone ||
-                   document.referrer.includes('android-app://');
-        }
-
-        if (isPwaInstalled()) {
-            console.log('La PWA se está ejecutando en modo standalone');
-        }
-    </script>
+        }, 1000);
+    });
+</script>
 
     <style>
         /* Animación para el banner */
