@@ -15,7 +15,139 @@
     
     <!-- Manifest para PWA -->
     <link rel="manifest" href="{{ secure_url('manifest.json') }}" crossorigin="use-credentials">
+
+    <!-- Carga Lottie desde CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.4/lottie.min.js"></script>
     
+    <style>
+        #app-splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff; /* Color de fondo */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+             opacity: 1;
+        transition: opacity 0.5s ease-out; /* Transición de 0.5 segundos */
+        }
+        
+        #lottie-animation {
+            width: 80%;
+            max-width: 300px;
+            height: auto;
+        }
+
+        /* Oculto inicialmente */
+    #app {
+        opacity: 0;
+        transition: opacity 0.5s ease-in; /* Transición para la app */
+    }
+    
+    /* Clase para el fade out */
+    .splash-fade-out {
+        opacity: 0 !important;
+    }
+    
+    /* Clase para mostrar la app */
+    .app-fade-in {
+        opacity: 1 !important;
+    }
+    </style>
+
+    <!-- Splash Screen -->
+    <div id="app-splash">
+        <div id="lottie-animation"></div>
+    </div>
+
+    <!-- Contenedor principal de la app (oculto inicialmente) -->
+    <div id="app" style="display: none;">
+        @yield('content')
+    </div>
+
+    <!-- Scripts -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configuración
+        const MAX_DURATION = 5000; // 5 segundos máximo
+        const ANIMATION_SPEED = 2; // Velocidad x2
+        const FADE_DURATION = 500; // 0.5 segundos para el fade
+        
+        // Variables de control
+        let animationCompleted = false;
+        let startTime = Date.now();
+        
+        // Carga la animación Lottie
+        var animation = lottie.loadAnimation({
+            container: document.getElementById('lottie-animation'),
+            renderer: 'svg',
+            loop: false,
+            autoplay: true,
+            path: '/js/animacion.json'
+        });
+        
+        // Acelera la animación
+        animation.setSpeed(ANIMATION_SPEED);
+        
+        // Cuando la animación termina
+        animation.addEventListener('complete', function() {
+            animationCompleted = true;
+            hideSplashIfReady();
+        });
+        
+        // Por si hay algún error
+        animation.addEventListener('data_failed', function() {
+            console.error('Error al cargar la animación');
+            hideSplash();
+        });
+        
+        // Temporizador de duración máxima
+        setTimeout(hideSplashIfReady, MAX_DURATION);
+        
+        // Función para ocultar el splash cuando esté listo
+        function hideSplashIfReady() {
+            // Calcula el tiempo transcurrido
+            const elapsed = Date.now() - startTime;
+            
+            // Si la animación ya completó o pasaron los 5 segundos
+            if (animationCompleted || elapsed >= MAX_DURATION) {
+                hideSplash();
+            }
+        }
+        
+        // Función para ocultar el splash con efecto fade
+        function hideSplash() {
+            const splash = document.getElementById('app-splash');
+            const app = document.getElementById('app');
+            
+            // Aplicamos la clase para el fade out
+            splash.classList.add('splash-fade-out');
+            
+            // Mostramos la app antes del fade para que esté lista
+            app.style.display = 'block';
+            
+            // Aplicamos fade in a la app después de un pequeño delay
+            setTimeout(() => {
+                app.classList.add('app-fade-in');
+            }, 50);
+            
+            // Eliminamos el splash del DOM después de la transición
+            setTimeout(() => {
+                splash.style.display = 'none';
+                
+                // Detener la animación para liberar recursos
+                if (animation) {
+                    animation.stop();
+                    animation.destroy();
+                }
+            }, FADE_DURATION);
+        }
+    });
+</script>
+
     <style>
         .bg-astral {
             background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #9333ea 100%);
