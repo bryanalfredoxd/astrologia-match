@@ -304,6 +304,24 @@
                         </div>
                     </div>
 
+                    <!-- Sección Términos y Condiciones -->
+                    <div class="mt-6">
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="terminos_condiciones" name="terminos_condiciones" type="checkbox" required
+                                    class="focus:ring-[#FFD700] h-4 w-4 text-[#FFD700] border border-[#4A0E7B] rounded bg-white bg-opacity-15 @error('terminos_condiciones') border-red-500 @enderror">
+                            </div>
+                            <div class="ml-3">
+                                <label for="terminos_condiciones" class="block text-[#A7B3EB] text-sm">
+                                    Acepto los <a href="#" class="text-[#FFD700] hover:text-[#F8C800] underline" target="_blank">Términos y Condiciones</a> y la <a href="#" class="text-[#FFD700] hover:text-[#F8C800] underline" target="_blank">Política de Privacidad</a>
+                                </label>
+                                @error('terminos_condiciones')
+                                    <p class="text-red-500 text-xs mt-1">Debes aceptar los términos y condiciones</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
                     <button type="submit" class="w-full flex justify-center items-center px-6 py-3 bg-[#FFD700] hover:bg-[#F8C800] text-[#0A0E2A] font-extrabold rounded-full transition duration-300 mt-8 text-lg transform hover:scale-105 shadow-lg hover:shadow-xl">
                         <i class="fas fa-rocket mr-3 text-xl"></i> ¡Comenzar mi viaje astral!
                     </button>

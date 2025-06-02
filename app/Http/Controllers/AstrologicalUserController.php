@@ -32,6 +32,7 @@ class AstrologicalUserController extends Controller
             'lugar_nacimiento' => $validatedData['lugar_nacimiento'],
             'genero' => $validatedData['genero'],
             'orientacion_sexual' => $validatedData['orientacion_sexual'],
+            'terminos_condiciones' => 'required|accepted'
         ]);
 
         // Redirección después del registro (puedes cambiarla según tus necesidades)
