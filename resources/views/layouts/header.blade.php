@@ -1,39 +1,19 @@
 <!-- HEADER -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url('/') }}">
-                <i class="bi bi-stars"></i> AstroMatch
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ url('/') }}">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Cómo funciona</a>
-                    </li>
-                    <li class="nav-item d-none d-lg-block">
-                        <div class="nav-link">|</div>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Testimonios</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Contacto</a>
-                    </li>
-                    <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
-                        <a class="btn btn-outline-light cosmic-btn-login" href="#">
-                            <span class="btn-login-content">
-                                Iniciar sesión
-                            </span>
-                            <span class="cosmic-login-effect"></span>
-                        </a>
-                    </li>
-                </ul>
+<!-- Barra de navegación optimizada para móviles -->
+        <nav class="bg-astral text-white shadow-lg sticky top-0 z-50">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-star text-yellow-300 text-xl md:text-2xl"></i>
+                    <a href="{{ url('/') }}" class="text-lg md:text-xl font-bold">AstroMatch</a>
+                </div>
+                <div class="flex space-x-2">
+                    <a href="#" class="px-3 py-1 md:px-4 md:py-2 text-sm md:text-base rounded-full bg-white text-blue-800 font-semibold hover:bg-blue-100">
+                        Ingresar
+                    </a>
+                    <a href="{{ route('register') }}" class="px-3 py-1 md:px-4 md:py-2 text-sm md:text-base rounded-full bg-yellow-400 text-blue-900 font-semibold hover:bg-yellow-300">
+                        Registro
+                    </a>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
     

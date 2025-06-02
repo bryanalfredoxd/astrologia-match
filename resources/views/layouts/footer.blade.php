@@ -1,49 +1,60 @@
 <!-- FOOTER -->
-    <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4 mb-lg-0">
-                    <h5 class="mb-4"><i class="bi bi-stars me-2"></i> AstroMatch</h5>
-                    <p>La plataforma líder en emparejamiento astrológico. Conectando almas afines desde 2023.</p>
+<!-- Footer optimizado para móviles -->
+<footer class="bg-gray-900 text-white py-4 md:py-8">
+    <div class="container mx-auto px-3 md:px-4">
+        <div class="flex flex-col md:grid md:grid-cols-3 gap-4 md:gap-6">
+            <!-- Logo y descripción -->
+            <div class="text-center md:text-left mb-2 md:mb-0">
+                <div class="flex items-center justify-center md:justify-start space-x-1 md:space-x-2 mb-2 md:mb-3">
+                    <i class="fas fa-star text-yellow-300 text-lg md:text-xl"></i>
+                    <span class="text-base md:text-lg font-bold">AstroMatch</span>
                 </div>
-                <div class="col-lg-2 col-md-4 mb-4 mb-md-0">
-                    <h5 class="mb-4">Enlaces</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#" class="text-decoration-none text-light">Inicio</a></li>
-                        <li class="mb-2"><a href="#" class="text-decoration-none text-light">Cómo funciona</a></li>
-                        <li class="mb-2"><a href="#" class="text-decoration-none text-light">Precios</a></li>
-                        <li class="mb-2"><a href="#" class="text-decoration-none text-light">Blog</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-2 col-md-4 mb-4 mb-md-0">
-                    <h5 class="mb-4">Legal</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#" class="text-decoration-none text-light">Términos</a></li>
-                        <li class="mb-2"><a href="#" class="text-decoration-none text-light">Privacidad</a></li>
-                        <li class="mb-2"><a href="#" class="text-decoration-none text-light">Cookies</a></li>
-                        <li class="mb-2"><a href="#" class="text-decoration-none text-light">FAQ</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-4 col-md-4">
-                    <h5 class="mb-4">Contacto</h5>
-                    <p><i class="bi bi-envelope me-2"></i> hola@astromatch.com</p>
-                    <div class="social-icons">
-                        <a href="#"><i class="bi bi-facebook"></i></a>
-                        <a href="#"><i class="bi bi-instagram"></i></a>
-                        <a href="#"><i class="bi bi-twitter"></i></a>
-                        <a href="#"><i class="bi bi-tiktok"></i></a>
-                    </div>
-                </div>
+                <p class="text-[0.65rem] md:text-xs text-gray-400">
+                    <i class="fas fa-globe-americas mr-1"></i> Emparejamiento astrológico por proximidad geográfica.
+                </p>
             </div>
-            <hr class="my-4 bg-secondary opacity-10">
-            <div class="row">
-                <div class="col-md-6 text-center text-md-start">
-                    <p class="mb-0">&copy; {{ date('Y') }} AstroMatch. Todos los derechos reservados.</p>
-                </div>
-                <div class="col-md-6 text-center text-md-end">
-                    <p class="mb-0"><small>Hecho con <i class="bi bi-heart-fill text-danger"></i> en el cosmos</small></p>
-                </div>
+            
+            <!-- Legal -->
+            <div class="text-center md:text-left mb-2 md:mb-0">
+                <h3 class="text-sm md:text-base font-semibold mb-1 md:mb-2">
+                    <i class="fas fa-balance-scale mr-1 md:mr-2"></i> Legal
+                </h3>
+                <ul class="space-y-0.5 md:space-y-1">
+                    <li><a href="#" class="text-[0.65rem] md:text-xs text-gray-400 hover:text-white flex items-center justify-center md:justify-start">
+                        <i class="fas fa-file-contract mr-1"></i> Términos
+                    </a></li>
+                    <li><a href="#" class="text-[0.65rem] md:text-xs text-gray-400 hover:text-white flex items-center justify-center md:justify-start">
+                        <i class="fas fa-lock mr-1"></i> Privacidad
+                    </a></li>
+                </ul>
+            </div>
+            
+            <!-- Contacto -->
+            <div class="text-center md:text-left">
+                <h3 class="text-sm md:text-base font-semibold mb-1 md:mb-2">
+                    <i class="fas fa-envelope mr-1 md:mr-2"></i> Contacto
+                </h3>
+                <ul class="space-y-0.5 md:space-y-1">
+                    <li class="flex items-start justify-center md:justify-start">
+                        <i class="fas fa-at mt-[0.15rem] mr-1 text-gray-400 text-[0.6rem] md:text-xs"></i>
+                        <span class="text-[0.65rem] md:text-xs text-gray-400">contacto@astromatch.com</span>
+                    </li>
+                    <li class="flex items-start justify-center md:justify-start">
+                        <i class="fab fa-whatsapp mt-[0.15rem] mr-1 text-gray-400 text-[0.6rem] md:text-xs"></i>
+                        <span class="text-[0.65rem] md:text-xs text-gray-400">+58 123 456 7890</span>
+                    </li>
+                </ul>
             </div>
         </div>
-    </footer>
+        
+        <div class="border-t border-gray-800 mt-4 md:mt-6 pt-4 md:pt-6 text-center text-gray-400">
+            <p class="text-[0.6rem] md:text-xs">
+                <i class="far fa-copyright mr-1"></i> 2025 AstroMatch. Todos los derechos reservados.
+            </p>
+            <p class="mt-0.5 text-[0.55rem]">
+                <i class="fas fa-graduation-cap mr-1"></i> Trabajo Especial de Grado - UNELLEZ
+            </p>
+        </div>
+    </div>
+</footer>
 

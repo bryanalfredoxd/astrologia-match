@@ -9,6 +9,7 @@ Route::get('/', function () {
 });
 
 // Rutas de usuario
-Route::get('/registrar-usuario', [UsuarioController::class, 'create'])->name('usuarios.create');
-Route::post('/registrar-usuario', [UsuarioController::class, 'store'])->name('usuarios.store');
+Route::get('/registro', function () {
+    return view('registro');
+})->name('register');
 
