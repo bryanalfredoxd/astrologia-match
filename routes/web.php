@@ -10,7 +10,7 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/register', function () {
-    return view('registro'); // Reemplaza con tu vista actual
+    return view('auth.registro'); // Reemplaza con tu vista actual
 })->name('register');
 
 Route::post('/register', [AstrologicalUserController::class, 'register'])->name('register.submit');

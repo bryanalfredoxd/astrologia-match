@@ -141,7 +141,7 @@
     <!-- Contenedor principal de la app (oculto inicialmente) -->
     <div id="app" style="display: none;">
         
-        @include('layouts.header')
+        @include('layouts.home.header')
 
         <!-- Contenido principal -->
         <main>
@@ -378,7 +378,7 @@
         }
     </style>
 
-    @include('layouts.footer')
+    @include('layouts.home.footer')
 
 </body>
 </html>
