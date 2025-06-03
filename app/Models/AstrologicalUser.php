@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
-class AstrologicalUser extends Model
+class AstrologicalUser extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     protected $table = 'astrological_users';
 
@@ -24,5 +26,6 @@ class AstrologicalUser extends Model
 
     protected $hidden = [
         'password',
+        'remember_token',
     ];
 }

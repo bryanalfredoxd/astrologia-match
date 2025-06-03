@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('lugar_nacimiento');
             $table->string('genero');
             $table->string('orientacion_sexual');
+            $table->rememberToken();
             $table->timestamps();
         });
     }
