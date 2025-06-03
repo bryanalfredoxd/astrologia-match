@@ -13,4 +13,14 @@ Route::get('/register', function () {
     return view('auth.registro'); // Reemplaza con tu vista actual
 })->name('register');
 
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
+
+Route::get('/astromatch', function () {
+    return view('astromatch');
+})->name('astromatch');
+
+
+
 Route::post('/register', [AstrologicalUserController::class, 'register'])->name('register.submit');

@@ -7,7 +7,7 @@
                     <a href="{{ url('/') }}" class="text-lg md:text-xl font-bold">AstroMatch</a>
                 </div>
                 <div class="flex space-x-2">
-                    <a href="#" class="px-3 py-1 md:px-4 md:py-2 text-sm md:text-base rounded-full bg-white text-blue-800 font-semibold hover:bg-blue-100">
+                    <a href="{{ route('login') }}" class="px-3 py-1 md:px-4 md:py-2 text-sm md:text-base rounded-full bg-white text-blue-800 font-semibold hover:bg-blue-100">
                         Ingresar
                     </a>
                     <a href="{{ route('register') }}" class="px-3 py-1 md:px-4 md:py-2 text-sm md:text-base rounded-full bg-yellow-400 text-blue-900 font-semibold hover:bg-yellow-300">

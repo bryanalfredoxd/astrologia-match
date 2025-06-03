@@ -1,0 +1,29 @@
+.login-card {
+    background: rgba(15, 23, 42, 0.8); /* Fondo semitransparente oscuro */
+    backdrop-filter: blur(10px);
+}
+
+.input-field:focus {
+    box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.3);
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    color: #A7B3EB;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid rgba(167, 179, 235, 0.3);
+}
+
+.auth-divider::before {
+    margin-right: 1rem;
+}
+
+.auth-divider::after {
+    margin-left: 1rem;
+}

@@ -9,7 +9,7 @@
                 <h1 class="hero-title text-3xl md:text-5xl font-bold mb-4">Encuentra tu conexión cósmica</h1>
                 <p class="hero-subtitle text-lg md:text-xl mb-6">Descubre relaciones basadas en astrología y proximidad.</p>
                 <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
-                    <a href="#" class="px-4 py-2 md:px-6 md:py-3 bg-yellow-400 text-blue-900 font-bold rounded-full hover:bg-yellow-300 text-center text-sm md:text-base flex items-center justify-center">
+                    <a href="{{ route('register') }}" class="px-4 py-2 md:px-6 md:py-3 bg-yellow-400 text-blue-900 font-bold rounded-full hover:bg-yellow-300 text-center text-sm md:text-base flex items-center justify-center">
                         <i class="fas fa-rocket mr-2"></i> Comenzar ahora
                     </a>
                     <a href="#" class="px-4 py-2 md:px-6 md:py-3 bg-white bg-opacity-20 text-white font-bold rounded-full hover:bg-opacity-30 text-center text-sm md:text-base flex items-center justify-center">
@@ -92,7 +92,7 @@
             <p class="text-base md:text-xl mb-6 md:mb-8 max-w-2xl mx-auto">
                 <i class="fas fa-map-marker-alt mr-2"></i> Encuentra personas compatibles según los astros cerca de ti.
             </p>
-            <a href="#" class="cta-button inline-block px-6 py-3 md:px-8 md:py-4 bg-yellow-400 text-blue-900 font-bold rounded-full hover:bg-yellow-300 text-sm md:text-lg flex items-center justify-center mx-auto w-max">
+            <a href="{{ route('register') }}" class="cta-button inline-block px-6 py-3 md:px-8 md:py-4 bg-yellow-400 text-blue-900 font-bold rounded-full hover:bg-yellow-300 text-sm md:text-lg flex items-center justify-center mx-auto w-max">
                 <i class="fas fa-rocket mr-2"></i> Comenzar ahora
             </a>
         </div>
