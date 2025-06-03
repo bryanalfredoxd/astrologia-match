@@ -36,6 +36,6 @@ class AstrologicalUserController extends Controller
         ]);
 
         // Redirección después del registro (puedes cambiarla según tus necesidades)
-        return redirect()->route('home')->with('success', '¡Registro exitoso!');
+        return redirect()->route('login')->with('success', '¡Registro exitoso!');
     }
 }

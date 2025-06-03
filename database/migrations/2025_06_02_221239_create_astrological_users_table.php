@@ -18,6 +18,16 @@ return new class extends Migration
             $table->string('lugar_nacimiento');
             $table->string('genero');
             $table->string('orientacion_sexual');
+            // Campos de geolocalización
+            $table->decimal('latitud', 10, 8)->nullable();
+            $table->decimal('longitud', 11, 8)->nullable();
+            // Campos adicionales
+            $table->text('biografia')->nullable();
+            $table->string('foto_perfil_url', 500)->nullable();
+            // Campos de estado y verificación (opcionales con valores por defecto)
+            $table->boolean('activo')->default(true);
+            $table->timestamp('email_verificado_at')->nullable();
+
             $table->rememberToken();
             $table->timestamps();
         });
