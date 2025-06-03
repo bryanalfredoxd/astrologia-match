@@ -24,7 +24,7 @@
             <!-- Tauro -->
             <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <img src="/images/zodiaco/taurus.png" alt="Tauro" class="w-full h-full object-contain">
+                    <img src="/images/zodiaco/tauro.png" alt="Tauro" class="w-full h-full object-contain">
                 </div>
                 <h3 class="text-lg md:text-xl font-semibold text-gray-800 mb-1">Tauro</h3>
                 <p class="text-sm text-green-500 font-medium mb-1">Tierra - Fijo</p>
@@ -37,7 +37,7 @@
             <!-- Géminis -->
             <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <img src="/images/zodiaco/gemini.png" alt="Géminis" class="w-full h-full object-contain">
+                    <img src="/images/zodiaco/géminis.png" alt="Géminis" class="w-full h-full object-contain">
                 </div>
                 <h3 class="text-lg md:text-xl font-semibold text-gray-800 mb-1">Géminis</h3>
                 <p class="text-sm text-blue-500 font-medium mb-1">Aire - Mutable</p>
@@ -50,7 +50,7 @@
             <!-- Cáncer -->
             <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <img src="/images/zodiaco/cancer.png" alt="Cáncer" class="w-full h-full object-contain">
+                    <img src="/images/zodiaco/cáncer.png" alt="Cáncer" class="w-full h-full object-contain">
                 </div>
                 <h3 class="text-lg md:text-xl font-semibold text-gray-800 mb-1">Cáncer</h3>
                 <p class="text-sm text-indigo-500 font-medium mb-1">Agua - Cardinal</p>
@@ -102,7 +102,7 @@
             <!-- Escorpio -->
             <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <img src="/images/zodiaco/scorpio.png" alt="Scorpio" class="w-full h-full object-contain">
+                    <img src="/images/zodiaco/escorpio.png" alt="Scorpio" class="w-full h-full object-contain">
                 </div>
                 <h3 class="text-lg md:text-xl font-semibold text-gray-800 mb-1">Escorpio</h3>
                 <p class="text-sm text-indigo-500 font-medium mb-1">Agua - Fijo</p>
@@ -115,7 +115,7 @@
             <!-- Sagitario -->
             <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <img src="/images/zodiaco/sagittarius.png" alt="Sagittarius" class="w-full h-full object-contain">
+                    <img src="/images/zodiaco/sagitario.png" alt="Sagittarius" class="w-full h-full object-contain">
                 </div>
                 <h3 class="text-lg md:text-xl font-semibold text-gray-800 mb-1">Sagitario</h3>
                 <p class="text-sm text-red-500 font-medium mb-1">Fuego - Mutable</p>
@@ -128,7 +128,7 @@
             <!-- Capricornio -->
             <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <img src="/images/zodiaco/capricorn.png" alt="Capricorn" class="w-full h-full object-contain">
+                    <img src="/images/zodiaco/capricornio.png" alt="Capricorn" class="w-full h-full object-contain">
                 </div>
                 <h3 class="text-lg md:text-xl font-semibold text-gray-800 mb-1">Capricornio</h3>
                 <p class="text-sm text-green-500 font-medium mb-1">Tierra - Cardinal</p>
@@ -141,7 +141,7 @@
             <!-- Acuario -->
             <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <img src="/images/zodiaco/aquarius.png" alt="Aquarius" class="w-full h-full object-contain">
+                    <img src="/images/zodiaco/acuario.png" alt="Aquarius" class="w-full h-full object-contain">
                 </div>
                 <h3 class="text-lg md:text-xl font-semibold text-gray-800 mb-1">Acuario</h3>
                 <p class="text-sm text-blue-500 font-medium mb-1">Aire - Fijo</p>
@@ -154,7 +154,7 @@
             <!-- Piscis -->
             <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <img src="/images/zodiaco/pisces.png" alt="Pisces" class="w-full h-full object-contain">
+                    <img src="/images/zodiaco/piscis.png" alt="Pisces" class="w-full h-full object-contain">
                 </div>
                 <h3 class="text-lg md:text-xl font-semibold text-gray-800 mb-1">Piscis</h3>
                 <p class="text-sm text-indigo-500 font-medium mb-1">Agua - Mutable</p>

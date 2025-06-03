@@ -28,7 +28,7 @@
             
             <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-10 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
-                    <img src="{{ asset('images/zodiaco/taurus.png') }}" alt="Tauro" class="w-full h-full object-contain">
+                    <img src="{{ asset('images/zodiaco/tauro.png') }}" alt="Tauro" class="w-full h-full object-contain">
                 </div>
                 <h3 class="text-lg md:text-xl font-semibold text-white mb-1">Tauro</h3>
                 <p class="text-sm text-green-400 font-medium mb-1">Tierra - Fijo</p>
@@ -40,7 +40,7 @@
             
             <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-10 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
-                    <img src="{{ asset('images/zodiaco/gemini.png') }}" alt="Géminis" class="w-full h-full object-contain">
+                    <img src="{{ asset('images/zodiaco/géminis.png') }}" alt="Géminis" class="w-full h-full object-contain">
                 </div>
                 <h3 class="text-lg md:text-xl font-semibold text-white mb-1">Géminis</h3>
                 <p class="text-sm text-blue-400 font-medium mb-1">Aire - Mutable</p>
@@ -52,7 +52,7 @@
             
             <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-10 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
-                    <img src="{{ asset('images/zodiaco/cancer.png') }}" alt="Cáncer" class="w-full h-full object-contain">
+                    <img src="{{ asset('images/zodiaco/cáncer.png') }}" alt="Cáncer" class="w-full h-full object-contain">
                 </div>
                 <h3 class="text-lg md:text-xl font-semibold text-white mb-1">Cáncer</h3>
                 <p class="text-sm text-indigo-400 font-medium mb-1">Agua - Cardinal</p>
@@ -357,7 +357,7 @@
             
             <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-10 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
-                    <img src="{{ asset('images/zodiaco/scorpio.png') }}" alt="Scorpio" class="w-full h-full object-contain">
+                    <img src="{{ asset('images/zodiaco/escorpio.png') }}" alt="Scorpio" class="w-full h-full object-contain">
                 </div>
                 <h3 class="text-lg md:text-xl font-semibold text-white mb-1">Escorpio</h3>
                 <p class="text-sm text-indigo-400 font-medium mb-1">Agua - Fijo</p>
@@ -369,7 +369,7 @@
             
             <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-10 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
-                    <img src="{{ asset('images/zodiaco/sagittarius.png') }}" alt="Sagittarius" class="w-full h-full object-contain">
+                    <img src="{{ asset('images/zodiaco/sagitario.png') }}" alt="Sagitario" class="w-full h-full object-contain">
                 </div>
                 <h3 class="text-lg md:text-xl font-semibold text-white mb-1">Sagitario</h3>
                 <p class="text-sm text-red-400 font-medium mb-1">Fuego - Mutable</p>
@@ -381,7 +381,7 @@
             
             <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-10 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
-                    <img src="{{ asset('images/zodiaco/capricorn.png') }}" alt="Capricorn" class="w-full h-full object-contain">
+                    <img src="{{ asset('images/zodiaco/capricornio.png') }}" alt="Capricorn" class="w-full h-full object-contain">
                 </div>
                 <h3 class="text-lg md:text-xl font-semibold text-white mb-1">Capricornio</h3>
                 <p class="text-sm text-green-400 font-medium mb-1">Tierra - Cardinal</p>
@@ -393,7 +393,7 @@
             
             <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-10 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
-                    <img src="{{ asset('images/zodiaco/aquarius.png') }}" alt="Aquarius" class="w-full h-full object-contain">
+                    <img src="{{ asset('images/zodiaco/acuario.png') }}" alt="Aquarius" class="w-full h-full object-contain">
                 </div>
                 <h3 class="text-lg md:text-xl font-semibold text-white mb-1">Acuario</h3>
                 <p class="text-sm text-blue-400 font-medium mb-1">Aire - Fijo</p>
@@ -405,7 +405,7 @@
             
             <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-10 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
-                    <img src="{{ asset('images/zodiaco/pisces.png') }}" alt="Pisces" class="w-full h-full object-contain">
+                    <img src="{{ asset('images/zodiaco/piscis.png') }}" alt="Pisces" class="w-full h-full object-contain">
                 </div>
                 <h3 class="text-lg md:text-xl font-semibold text-white mb-1">Piscis</h3>
                 <p class="text-sm text-indigo-400 font-medium mb-1">Agua - Mutable</p>

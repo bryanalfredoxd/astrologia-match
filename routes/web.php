@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AstrologicalUserController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
+use App\Models\AstrologicalUser; // Asegúrate de importar el modelo
 
 // Página principal con splash screen
 Route::get('/', function () {
@@ -11,7 +12,7 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/register', function () {
-    return view('auth.registro'); 
+    return view('auth.registro');
 })->name('register');
 
 // Ruta de inicio de sesión
@@ -25,6 +26,14 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/astromatch', function () {
     // Obtener el usuario autenticado
     $user = Auth::user(); // Esto obtendrá el objeto AstrologicalUser del usuario logueado
+
+    // Verificar si el usuario está autenticado y es una instancia de AstrologicalUser
+    if ($user instanceof AstrologicalUser) {
+        // Si el usuario es de tipo AstrologicalUser, carga las relaciones
+        $user->load('datosAstralesBasicos.signoSolar');
+    } else if (!Auth::check()) {
+        return redirect()->route('login'); // Redirige a la ruta de login
+    }
 
     // Pasar el usuario a la vista 'astromatch'
     return view('astromatch', compact('user'));
