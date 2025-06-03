@@ -127,9 +127,64 @@
             @endif
         </div>
 
-        {{-- Botón de edición de perfil (Derecha del todo, posición absoluta) --}}
-        <a href="#" class="absolute top-6 right-6 text-[#FFD700] hover:text-white transition-colors duration-200">
-            <i class="fas fa-edit text-2xl sm:text-3xl"></i>
-        </a>
+        {{-- Botón para calcular datos astrales con IA (Derecha del todo, posición absoluta) --}}
+        {{-- CAMBIADO DE <a> A <button> y añadido ID --}}
+        <button id="calculateGroqAstrology" class="absolute top-6 right-6 text-[#FFD700] hover:text-white transition-colors duration-200 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-[#FFD700]">
+            <i class="fas fa-magic text-2xl sm:text-3xl"></i> {{-- Icono de magia o estrella para la IA --}}
+        </button>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const calculateButton = document.getElementById('calculateGroqAstrology');
+
+        if (calculateButton) {
+            calculateButton.addEventListener('click', function(event) {
+                event.preventDefault(); // Previene el comportamiento por defecto del botón/enlace
+
+                // Recolectar los datos del usuario (desde el objeto Blade $user)
+                const userData = {
+                    nombre_completo: "{{ $user->nombre_completo ?? 'Usuario Desconocido' }}",
+                    fecha_nacimiento: "{{ $user->fecha_nacimiento ?? '' }}",
+                    hora_nacimiento: "{{ $user->hora_nacimiento ?? '' }}",
+                    lugar_nacimiento: "{{ $user->lugar_nacimiento ?? '' }}",
+                    genero: "{{ $user->genero ?? '' }}"
+                };
+
+                // Opcional: Mostrar un indicador de carga
+                calculateButton.innerHTML = '<i class="fas fa-spinner fa-spin text-2xl sm:text-3xl"></i>';
+                calculateButton.disabled = true;
+
+                // Enviar los datos al backend usando Fetch API
+                fetch("{{ route('groq.calculate-astrology') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}' // Token CSRF para seguridad en Laravel
+                    },
+                    body: JSON.stringify(userData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Redirigir a la página de resultados con los datos de la IA
+                    // Podrías pasar los datos a la URL como parámetros (cuidado con el tamaño)
+                    // O, más seguro, guardarlos en localStorage y que la nueva página los lea
+                    localStorage.setItem('groqResponse', JSON.stringify(data));
+                    window.location.href = "{{ route('groq.show-response') }}";
+                })
+                .catch(error => {
+                    console.error('Error al enviar datos a Groq API:', error);
+                    alert('Hubo un error al calcular los datos astrales con la IA. Consulta la consola.');
+                    calculateButton.innerHTML = '<i class="fas fa-magic text-2xl sm:text-3xl"></i>';
+                    calculateButton.disabled = false;
+                });
+            });
+        }
+    });
+</script>

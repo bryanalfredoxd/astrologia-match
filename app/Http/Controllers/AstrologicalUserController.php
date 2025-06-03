@@ -21,11 +21,18 @@ class AstrologicalUserController extends Controller
             'password' => 'required|string|min:8',
             'fecha_nacimiento' => 'required|date',
             'hora_nacimiento' => 'required',
-            'lugar_nacimiento' => 'required|string|max:255',
+            'lugar_nacimiento' => 'required|string|max:255', // Sigue validando como string de max 255
             'genero' => 'required|string|in:Masculino,Femenino',
             'orientacion_sexual' => 'required|string|in:Heterosexual,Homosexual,Bisexual,Pansexual,Asexual',
-            'terminos_condiciones' => 'required|accepted' // Asegúrate de que este campo existe en tu formulario
+            'terminos_condiciones' => 'required|accepted'
         ]);
+
+        // --- MODIFICACIÓN AQUÍ para lugar_nacimiento ---
+        // Obtener la ciudad del input
+        $ciudad = $validatedData['lugar_nacimiento'];
+        // Concatenar el país
+        $lugarNacimientoCompleto = $ciudad . ', Venezuela';
+        // --- FIN MODIFICACIÓN ---
 
         // Creación del usuario
         $user = AstrologicalUser::create([
@@ -34,7 +41,8 @@ class AstrologicalUserController extends Controller
             'password' => Hash::make($validatedData['password']),
             'fecha_nacimiento' => $validatedData['fecha_nacimiento'],
             'hora_nacimiento' => $validatedData['hora_nacimiento'],
-            'lugar_nacimiento' => $validatedData['lugar_nacimiento'],
+            // Usar la variable con el país concatenado
+            'lugar_nacimiento' => $lugarNacimientoCompleto,
             'genero' => $validatedData['genero'],
             'orientacion_sexual' => $validatedData['orientacion_sexual'],
             // 'terminos_condiciones' se valida, pero no se guarda directamente en el modelo por defecto.

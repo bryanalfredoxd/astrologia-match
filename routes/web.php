@@ -5,6 +5,7 @@ use App\Http\Controllers\AstrologicalUserController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Models\AstrologicalUser; // Asegúrate de importar el modelo
+use App\Http\Controllers\GroqAstrologyController;
 
 // Página principal con splash screen
 Route::get('/', function () {
@@ -41,3 +42,7 @@ Route::get('/astromatch', function () {
 
 
 Route::post('/register', [AstrologicalUserController::class, 'register'])->name('register.submit');
+
+// Rutas para la integración con Groq
+Route::post('/calculate-groq-astrology', [GroqAstrologyController::class, 'calculateAstrology'])->name('groq.calculate-astrology');
+Route::get('/groq-response', [GroqAstrologyController::class, 'showResponse'])->name('groq.show-response');
