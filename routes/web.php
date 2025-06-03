@@ -7,7 +7,7 @@ use App\Http\Controllers\AuthController;
 
 // Página principal con splash screen
 Route::get('/', function () {
-    return view('home');
+    return auth()->guard()->check() ? redirect()->route('astromatch') : view('home');
 })->name('home');
 
 Route::get('/register', function () {
