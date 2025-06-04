@@ -27,11 +27,14 @@
                 <h3 class="text-2xl sm:text-3xl font-bold mb-2">
                     @if(isset($user)) {{ $user->nombre_completo }} @else Tu Perfil Astral @endif
                 </h3>
+                @php
+                    $profileCompletion = isset($user) ? $user->profile_completion_percentage : 0;
+                @endphp
                 <p class="text-[#A7B3EB] text-base mb-3">
-                    Perfil Completado: 85%
+                    Perfil Completado: {{ $profileCompletion }}%
                 </p>
                 <div class="w-full max-w-md bg-[#0A0E2A] bg-opacity-50 rounded-full h-3">
-                    <div class="bg-[#FFD700] h-3 rounded-full" style="width: 85%"></div>
+                    <div class="bg-[#FFD700] h-3 rounded-full" style="width: {{ $profileCompletion }}%"></div>
                 </div>
             </div>
 

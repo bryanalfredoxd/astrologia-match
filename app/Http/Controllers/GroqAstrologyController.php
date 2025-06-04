@@ -26,8 +26,9 @@ class GroqAstrologyController extends Controller
                   "\n- Hora de Nacimiento: " . $validatedData['hora_nacimiento'] .
                   "\n- Lugar de Nacimiento: " . $validatedData['lugar_nacimiento'] .
                   "\n- Género: " . $validatedData['genero'] .
+                  "\nY ten en cuenta para la respuesta que quiero, que: Los signos los tengo asociados con numeros, es decir 1: Aries, 2: Tauro, 3: Géminis, 4: Cáncer, 5: Leo, 6: Virgo, 7: Libra, 8: Escorpio, 9: Sagitario, 10: Capricornio, 11: Acuario, 12: Piscis." .
                   "\nPor favor, responde de forma concisa con el signo lunar y ascendente." .
-                  "\nFormato de respuesta: \nSigno Lunar: [Signo]\nAscendente: [Signo]";
+                  "\nFormato de respuesta: \nSigno Lunar: [Numero] - [Signo]\nAscendente: [Numero] - [Signo]";
 
         // 3. Realizar la llamada a la API de Groq
         $groqApiKey = env('GROQ_API_KEY'); // Obtén tu API Key del archivo .env

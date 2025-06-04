@@ -35,6 +35,7 @@ return new class extends Migration
             ['nombre_signo' => 'Capricornio', 'elemento' => 'Tierra', 'modalidad' => 'Cardinal'],
             ['nombre_signo' => 'Acuario', 'elemento' => 'Aire', 'modalidad' => 'Fijo'],
             ['nombre_signo' => 'Piscis', 'elemento' => 'Agua', 'modalidad' => 'Mutable'],
+            ['nombre_signo' => 'Nada', 'elemento' => 'Nada', 'modalidad' => 'Nada'],
         ]);
     }
 
