@@ -23,20 +23,19 @@ return new class extends Migration
 
         // Insertar los datos de los signos zodiacales
         DB::table('signos_zodiacales')->insert([
-            ['nombre_signo' => 'Aries', 'elemento' => 'Fuego', 'modalidad' => 'Cardinal'],
-            ['nombre_signo' => 'Tauro', 'elemento' => 'Tierra', 'modalidad' => 'Fijo'],
-            ['nombre_signo' => 'Géminis', 'elemento' => 'Aire', 'modalidad' => 'Mutable'],
-            ['nombre_signo' => 'Cáncer', 'elemento' => 'Agua', 'modalidad' => 'Cardinal'],
-            ['nombre_signo' => 'Leo', 'elemento' => 'Fuego', 'modalidad' => 'Fijo'],
-            ['nombre_signo' => 'Virgo', 'elemento' => 'Tierra', 'modalidad' => 'Mutable'],
-            ['nombre_signo' => 'Libra', 'elemento' => 'Aire', 'modalidad' => 'Cardinal'],
-            ['nombre_signo' => 'Escorpio', 'elemento' => 'Agua', 'modalidad' => 'Fijo'],
-            ['nombre_signo' => 'Sagitario', 'elemento' => 'Fuego', 'modalidad' => 'Mutable'],
-            ['nombre_signo' => 'Capricornio', 'elemento' => 'Tierra', 'modalidad' => 'Cardinal'],
-            ['nombre_signo' => 'Acuario', 'elemento' => 'Aire', 'modalidad' => 'Fijo'],
-            ['nombre_signo' => 'Piscis', 'elemento' => 'Agua', 'modalidad' => 'Mutable'],
-            ['nombre_signo' => 'Nada', 'elemento' => 'Nada', 'modalidad' => 'Nada'],
-        ]);
+    ['nombre_signo' => 'Aries', 'elemento' => 'Fuego', 'modalidad' => 'Cardinal'],
+    ['nombre_signo' => 'Tauro', 'elemento' => 'Tierra', 'modalidad' => 'Fijo'],
+    ['nombre_signo' => 'Géminis', 'elemento' => 'Aire', 'modalidad' => 'Mutable'],
+    ['nombre_signo' => 'Cáncer', 'elemento' => 'Agua', 'modalidad' => 'Cardinal'],
+    ['nombre_signo' => 'Leo', 'elemento' => 'Fuego', 'modalidad' => 'Fijo'],
+    ['nombre_signo' => 'Virgo', 'elemento' => 'Tierra', 'modalidad' => 'Mutable'],
+    ['nombre_signo' => 'Libra', 'elemento' => 'Aire', 'modalidad' => 'Cardinal'],
+    ['nombre_signo' => 'Escorpio', 'elemento' => 'Agua', 'modalidad' => 'Fijo'],
+    ['nombre_signo' => 'Sagitario', 'elemento' => 'Fuego', 'modalidad' => 'Mutable'],
+    ['nombre_signo' => 'Capricornio', 'elemento' => 'Tierra', 'modalidad' => 'Cardinal'],
+    ['nombre_signo' => 'Acuario', 'elemento' => 'Aire', 'modalidad' => 'Fijo'],
+    ['nombre_signo' => 'Piscis', 'elemento' => 'Agua', 'modalidad' => 'Mutable'],
+]);
     }
 
     /**
