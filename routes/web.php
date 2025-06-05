@@ -46,3 +46,17 @@ Route::post('/register', [AstrologicalUserController::class, 'register'])->name(
 // Rutas para la integración con Groq
 Route::post('/calculate-groq-astrology', [GroqAstrologyController::class, 'calculateAstrology'])->name('groq.calculate-astrology');
 Route::get('/groq-response', [GroqAstrologyController::class, 'showResponse'])->name('groq.show-response');
+
+// Ruta para editar perfil (manteniendo groq-response como nombre de vista)
+Route::get('/profile/edit', function() {
+    $user = Auth::user();
+    return view('groq-response', compact('user'));
+})->name('profile.edit')->middleware('auth');
+
+// Ruta para mostrar resultados de Groq (modificada para pasar el usuario)
+Route::get('/groq-response', function() {
+    $user = Auth::user();
+    return view('groq-response', compact('user'));
+})->name('groq.show-response')->middleware('auth');
+
+Route::put('/profile/update', [AstrologicalUserController::class, 'update'])->name('profile.update')->middleware('auth');

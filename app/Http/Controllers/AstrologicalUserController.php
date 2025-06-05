@@ -7,9 +7,11 @@ use App\Models\SignoZodiacal;
 use App\Models\DatosAstralesBasicos;
 use App\Models\GroqAstrologyData; // Importa el modelo GroqAstrologyData
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class AstrologicalUserController extends Controller
 {
@@ -90,4 +92,51 @@ class AstrologicalUserController extends Controller
         if (($month == 2 && $day >= 19) || ($month == 3 && $day <= 20)) return 'Piscis';
         return 'Desconocido'; //
     }
+
+    public function update(Request $request)
+    {
+        /** @var \App\Models\AstrologicalUser $user */
+        $user = Auth::user();
+        
+        $validated = $request->validate([
+            'nombre_completo' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:astrological_users,email,'.$user->id,
+            'password' => 'nullable|string|min:8|confirmed',
+            'genero' => 'required|string|max:50',
+            'orientacion_sexual' => 'required|string|max:50',
+            'latitud' => 'nullable|numeric|between:-90,90',
+            'longitud' => 'nullable|numeric|between:-180,180',
+            'biografia' => 'nullable|string|max:1000',
+            'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Actualizar campos básicos
+        $user->nombre_completo = $validated['nombre_completo'];
+        $user->email = $validated['email'];
+        $user->genero = $validated['genero'];
+        $user->orientacion_sexual = $validated['orientacion_sexual'];
+        $user->latitud = $validated['latitud'];
+        $user->longitud = $validated['longitud'];
+        $user->biografia = $validated['biografia'];
+
+        // Actualizar contraseña si se proporcionó
+        if (!empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
+
+        // Manejar la imagen de perfil
+        if ($request->hasFile('foto_perfil')) {
+            if ($user->foto_perfil_url) {
+                Storage::delete($user->foto_perfil_url);
+            }
+            
+            $path = $request->file('foto_perfil')->store('profile-photos');
+            $user->foto_perfil_url = $path;
+        }
+
+        $user->save();
+
+        return redirect()->route('astromatch')->with('success', 'Perfil actualizado correctamente.');
+    }
+
 }

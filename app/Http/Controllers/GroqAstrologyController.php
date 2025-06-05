@@ -28,16 +28,36 @@ class GroqAstrologyController extends Controller
             return response()->json(['error' => 'Usuario no autenticado.'], 401);
         }
 
+        // Cargar los datos astrológicos existentes para el usuario
+        $existingAstrologyData = GroqAstrologyData::where('user_id', $userId)->first();
+
+        // Si ya existen datos y no son NULL, cargar la pantalla con esos datos
+        if ($existingAstrologyData && $existingAstrologyData->signo_lunar_id !== null && $existingAstrologyData->signo_ascendente_id !== null) {
+            $signoLunar = SignoZodiacal::where('id_signo', $existingAstrologyData->signo_lunar_id)->first();
+            $signoAscendente = SignoZodiacal::where('id_signo', $existingAstrologyData->signo_ascendente_id)->first();
+
+            $astrologyText = "Signo Lunar: " . ($signoLunar ? $signoLunar->id_signo . " - " . $signoLunar->nombre_signo : 'No disponible') . "\n";
+            $astrologyText .= "Ascendente: " . ($signoAscendente ? $signoAscendente->id_signo . " - " . $signoAscendente->nombre_signo : 'No disponible');
+
+            return response()->json(['astrology_data' => $astrologyText]);
+        }
+
+
         // 2. Preparar el prompt para la API de Groq
-        $prompt = "Calcula el signo lunar y ascendente (rising sign) de la siguiente persona, basándote en la astrología occidental y un enfoque general (no necesito precisión milimétrica, solo una estimación):" .
-                  "\n- Nombre: " . $validatedData['nombre_completo'] .
-                  "\n- Fecha de Nacimiento: " . $validatedData['fecha_nacimiento'] .
-                  "\n- Hora de Nacimiento: " . $validatedData['hora_nacimiento'] .
-                  "\n- Lugar de Nacimiento: " . $validatedData['lugar_nacimiento'] .
-                  "\n- Género: " . $validatedData['genero'] .
-                  "\nY ten en cuenta para la respuesta que quiero: Los signos los tengo asociados con numeros, es decir 1: Aries, 2: Tauro, 3: Géminis, 4: Cáncer, 5: Leo, 6: Virgo, 7: Libra, 8: Escorpio, 9: Sagitario, 10: Capricornio, 11: Acuario, 12: Piscis." .
-                  "\nPor favor, responde de forma concisa con el signo lunar y ascendente. Y verifica que estas aignando bien el numero correspondiente al signo, ya que son del 1 al 12 no hay mas opciones" .
-                  "\nFormato de respuesta: \nSigno Lunar: [Numero] - [Signo]\nAscendente: [Numero] - [Signo]";
+        $prompt = "Eres un astrólogo experto y amigable. Calcula el signo lunar y el signo ascendente (rising sign) de la siguiente persona, basándote en la astrología occidental y un enfoque general (no necesito precisión milimétrica, solo una estimación):" .
+                "\n- Nombre: " . $validatedData['nombre_completo'] .
+                "\n- Fecha de Nacimiento: " . $validatedData['fecha_nacimiento'] .
+                "\n- Hora de Nacimiento: " . $validatedData['hora_nacimiento'] .
+                "\n- Lugar de Nacimiento: " . $validatedData['lugar_nacimiento'] .
+                "\n- Género: " . $validatedData['genero'] .
+                // Clarificación y formato estricto para los signos y sus números.
+                "\n\nInstrucciones IMPORTANTES para la respuesta:" .
+                "\n1. Los signos zodiacales están asociados con números del 1 al 12 de la siguiente manera:" .
+                "\n   1: Aries, 2: Tauro, 3: Géminis, 4: Cáncer, 5: Leo, 6: Virgo, 7: Libra, 8: Escorpio, 9: Sagitario, 10: Capricornio, 11: Acuario, 12: Piscis." .
+                "\n2. SOLO debes usar los números del 1 al 12 para identificar los signos. Cualquier otro número (mayor a 12 o menor a 1) NO es válido y NO debe ser utilizado." .
+                "\n3. Tu respuesta debe ser CONCISA y seguir EXACTAMENTE el siguiente formato, sin texto adicional:" .
+                "\n   Signo Lunar: [Numero] - [Nombre del Signo]" .
+                "\n   Ascendente: [Numero] - [Nombre del Signo]";
 
         // 3. Realizar la llamada a la API de Groq
         $groqApiKey = env('GROQ_API_KEY');
@@ -103,6 +123,7 @@ class GroqAstrologyController extends Controller
 
     public function showResponse()
     {
-        return view('groq-response');
+        $user = Auth::user();
+        return view('groq-response', compact('user'));
     }
 }
