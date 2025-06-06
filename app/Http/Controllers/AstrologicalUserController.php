@@ -126,12 +126,28 @@ class AstrologicalUserController extends Controller
 
         // Manejar la imagen de perfil
         if ($request->hasFile('foto_perfil')) {
-            if ($user->foto_perfil_url) {
-                Storage::delete($user->foto_perfil_url);
+            // Eliminar la foto de perfil antigua si existe y es una URL pública
+                        if ($user->foto_perfil_url && \Illuminate\Support\Str::startsWith($user->foto_perfil_url, 'images/upload/img_user/')) {
+                $oldImagePath = public_path($user->foto_perfil_url);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath); // Eliminar el archivo físico
+                }
             }
-            
-            $path = $request->file('foto_perfil')->store('profile-photos');
-            $user->foto_perfil_url = $path;
+
+            $image = $request->file('foto_perfil');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $destinationPath = public_path('images/upload/img_user');
+
+            // Asegurarse de que el directorio exista
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true); // Crear directorio con permisos
+            }
+
+            // Mover la imagen al directorio público
+            $image->move($destinationPath, $imageName);
+
+            // Guardar la ruta relativa pública en la base de datos
+            $user->foto_perfil_url = 'images/upload/img_user/' . $imageName;
         }
 
         $user->save();

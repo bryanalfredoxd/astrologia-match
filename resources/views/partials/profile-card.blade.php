@@ -11,7 +11,7 @@
             <div class="w-48 h-48 sm:w-60 sm:h-60 rounded-full bg-[#0A0E2A] border-2 border-[#FFD700] flex items-center justify-center">
                 @if($user->foto_perfil_url)
                     {{-- Si hay foto de perfil, la mostrará --}}
-                    <img src="{{ asset('storage/' . $user->foto_perfil_url) }}" alt="Foto de Perfil" class="w-full h-full object-cover rounded-full">
+                    <img src="{{ asset($user->foto_perfil_url) }}" alt="Foto de Perfil" class="w-full h-full object-cover rounded-full">
                 @else
                     {{-- De lo contrario, muestra el icono del astronauta --}}
                     <i class="fas fa-user-astronaut text-7xl sm:text-8xl text-[#FFD700]"></i>
