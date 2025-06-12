@@ -18,8 +18,6 @@ return new class extends Migration
             $table->id('id_datos_astrales');
             $table->foreignId('id_usuario')->unique()->constrained('astrological_users')->onDelete('cascade'); // Relación 1:1 con astrological_users
             $table->foreignId('id_signo_solar')->constrained('signos_zodiacales', 'id_signo');
-            $table->foreignId('id_signo_lunar')->constrained('signos_zodiacales', 'id_signo');
-            $table->foreignId('id_ascendente')->constrained('signos_zodiacales', 'id_signo');
             $table->timestamp('fecha_calculo')->default(DB::raw('CURRENT_TIMESTAMP'));
         });
     }

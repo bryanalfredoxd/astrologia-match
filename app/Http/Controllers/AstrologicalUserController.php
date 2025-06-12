@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\AstrologicalUser;
-use App\Models\SignoZodiacal; // Importa el modelo SignoZodiacal
-use App\Models\DatosAstralesBasicos; // Importa el modelo DatosAstralesBasicos
+use App\Models\SignoZodiacal;
+use App\Models\DatosAstralesBasicos;
+use App\Models\GroqAstrologyData; // Importa el modelo GroqAstrologyData
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log; // Importar la fachada Log
-use Carbon\Carbon; // Para trabajar con fechas
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class AstrologicalUserController extends Controller
 {
@@ -21,18 +24,15 @@ class AstrologicalUserController extends Controller
             'password' => 'required|string|min:8',
             'fecha_nacimiento' => 'required|date',
             'hora_nacimiento' => 'required',
-            'lugar_nacimiento' => 'required|string|max:255', // Sigue validando como string de max 255
+            'lugar_nacimiento' => 'required|string|max:255',
             'genero' => 'required|string|in:Masculino,Femenino',
             'orientacion_sexual' => 'required|string|in:Heterosexual,Homosexual,Bisexual,Pansexual,Asexual',
             'terminos_condiciones' => 'required|accepted'
         ]);
 
-        // --- MODIFICACIÓN AQUÍ para lugar_nacimiento ---
-        // Obtener la ciudad del input
+        // Obtener la ciudad del input y concatenar el país
         $ciudad = $validatedData['lugar_nacimiento'];
-        // Concatenar el país
-        $lugarNacimientoCompleto = $ciudad . ', Venezuela';
-        // --- FIN MODIFICACIÓN ---
+        $lugarNacimientoCompleto = $ciudad . ', Venezuela'; //
 
         // Creación del usuario
         $user = AstrologicalUser::create([
@@ -41,50 +41,41 @@ class AstrologicalUserController extends Controller
             'password' => Hash::make($validatedData['password']),
             'fecha_nacimiento' => $validatedData['fecha_nacimiento'],
             'hora_nacimiento' => $validatedData['hora_nacimiento'],
-            // Usar la variable con el país concatenado
             'lugar_nacimiento' => $lugarNacimientoCompleto,
             'genero' => $validatedData['genero'],
             'orientacion_sexual' => $validatedData['orientacion_sexual'],
-            // 'terminos_condiciones' se valida, pero no se guarda directamente en el modelo por defecto.
-            // Si necesitas guardarlo, agrégalo al $fillable de AstrologicalUser y aquí.
         ]);
 
-        // --- Lógica para calcular y guardar el signo solar ---
+        // Lógica para calcular y guardar el signo solar
         $fechaNacimiento = Carbon::parse($validatedData['fecha_nacimiento']);
         $dia = $fechaNacimiento->day;
         $mes = $fechaNacimiento->month;
 
         $signoSolarNombre = $this->calcularSignoSolar($dia, $mes);
-
-        // Buscar el ID del signo solar en la tabla signos_zodiacales
-        $signoSolar = SignoZodiacal::where('nombre_signo', $signoSolarNombre)->first();
+        $signoSolar = SignoZodiacal::where('nombre_signo', $signoSolarNombre)->first(); //
 
         if ($signoSolar) {
             DatosAstralesBasicos::create([
                 'id_usuario' => $user->id,
                 'id_signo_solar' => $signoSolar->id_signo,
-                'id_signo_lunar' => 1, // Placeholder: Asigna un ID temporal (ej. Aries si es el id 1)
-                                       // Estos se calcularán más adelante
-                'id_ascendente' => 1,  // Placeholder: Asigna un ID temporal
             ]);
         } else {
-            // Manejar el caso donde el signo solar no se encuentra (debería existir si la tabla está bien poblada)
-            Log::error("Signo solar '$signoSolarNombre' no encontrado en la base de datos.");
+            Log::error("Signo solar '$signoSolarNombre' no encontrado en la base de datos."); //
+            // Opcional: manejar el error, como devolver un mensaje al usuario o lanzar una excepción.
         }
-        // --- Fin de la lógica para calcular y guardar el signo solar ---
+
+        // Aquí podrías crear un registro en groq_astrology_data si es necesario,
+        // aunque es nullable y podrías llenarlo más tarde.
+        // Si quieres crearlo vacío al registrar el usuario:
+        GroqAstrologyData::create([
+            'user_id' => $user->id,
+            // 'signo_lunar_id' y 'signo_ascendente_id' son nullable, se pueden dejar vacíos
+        ]);
 
 
-        // Redirección después del registro (puedes cambiarla según tus necesidades)
-        // Usamos back() para redirigir a la página anterior o a la ruta de login si no hay anterior
-        return redirect()->route('login')->with('success', '¡Registro exitoso! Por favor, inicia sesión.');
+        return redirect()->route('login')->with('success', '¡Registro exitoso! Por favor, inicia sesión.'); //
     }
 
-    /**
-     * Función para calcular el signo solar a partir del día y mes.
-     * @param int $day
-     * @param int $month
-     * @return string
-     */
     private function calcularSignoSolar($day, $month)
     {
         if (($month == 3 && $day >= 21) || ($month == 4 && $day <= 19)) return 'Aries';
@@ -99,6 +90,69 @@ class AstrologicalUserController extends Controller
         if (($month == 12 && $day >= 22) || ($month == 1 && $day <= 19)) return 'Capricornio';
         if (($month == 1 && $day >= 20) || ($month == 2 && $day <= 18)) return 'Acuario';
         if (($month == 2 && $day >= 19) || ($month == 3 && $day <= 20)) return 'Piscis';
-        return 'Desconocido'; // En caso de que no caiga en ninguna fecha (raro)
+        return 'Desconocido'; //
     }
+
+    public function update(Request $request)
+    {
+        /** @var \App\Models\AstrologicalUser $user */
+        $user = Auth::user();
+        
+        $validated = $request->validate([
+            'nombre_completo' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:astrological_users,email,'.$user->id,
+            'password' => 'nullable|string|min:8|confirmed',
+            'genero' => 'required|string|max:50',
+            'orientacion_sexual' => 'required|string|max:50',
+            'latitud' => 'nullable|numeric|between:-90,90',
+            'longitud' => 'nullable|numeric|between:-180,180',
+            'biografia' => 'nullable|string|max:1000',
+            'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Actualizar campos básicos
+        $user->nombre_completo = $validated['nombre_completo'];
+        $user->email = $validated['email'];
+        $user->genero = $validated['genero'];
+        $user->orientacion_sexual = $validated['orientacion_sexual'];
+        $user->latitud = $validated['latitud'];
+        $user->longitud = $validated['longitud'];
+        $user->biografia = $validated['biografia'];
+
+        // Actualizar contraseña si se proporcionó
+        if (!empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
+
+        // Manejar la imagen de perfil
+        if ($request->hasFile('foto_perfil')) {
+            // Eliminar la foto de perfil antigua si existe y es una URL pública
+                        if ($user->foto_perfil_url && \Illuminate\Support\Str::startsWith($user->foto_perfil_url, 'images/upload/img_user/')) {
+                $oldImagePath = public_path($user->foto_perfil_url);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath); // Eliminar el archivo físico
+                }
+            }
+
+            $image = $request->file('foto_perfil');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $destinationPath = public_path('images/upload/img_user');
+
+            // Asegurarse de que el directorio exista
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true); // Crear directorio con permisos
+            }
+
+            // Mover la imagen al directorio público
+            $image->move($destinationPath, $imageName);
+
+            // Guardar la ruta relativa pública en la base de datos
+            $user->foto_perfil_url = 'images/upload/img_user/' . $imageName;
+        }
+
+        $user->save();
+
+        return redirect()->route('astromatch')->with('success', 'Perfil actualizado correctamente.');
+    }
+
 }

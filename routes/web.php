@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Models\AstrologicalUser; // Asegúrate de importar el modelo
 use App\Http\Controllers\GroqAstrologyController;
+use App\Jobs\CalculateUserDistances;
 
 // Página principal con splash screen
 Route::get('/', function () {
@@ -32,6 +33,12 @@ Route::get('/astromatch', function () {
     if ($user instanceof AstrologicalUser) {
         // Si el usuario es de tipo AstrologicalUser, carga las relaciones
         $user->load('datosAstralesBasicos.signoSolar');
+
+        // *** AÑADIR ESTA LÍNEA PARA DESPACHAR EL JOB ***
+        // Despachar el job para calcular las distancias en segundo plano
+        // Se pasa una copia del usuario para evitar problemas de serialización
+        CalculateUserDistances::dispatch(clone $user);
+        
     } else if (!Auth::check()) {
         return redirect()->route('login'); // Redirige a la ruta de login
     }
@@ -46,3 +53,17 @@ Route::post('/register', [AstrologicalUserController::class, 'register'])->name(
 // Rutas para la integración con Groq
 Route::post('/calculate-groq-astrology', [GroqAstrologyController::class, 'calculateAstrology'])->name('groq.calculate-astrology');
 Route::get('/groq-response', [GroqAstrologyController::class, 'showResponse'])->name('groq.show-response');
+
+// Ruta para editar perfil (manteniendo groq-response como nombre de vista)
+Route::get('/profile/edit', function() {
+    $user = Auth::user();
+    return view('groq-response', compact('user'));
+})->name('profile.edit')->middleware('auth');
+
+// Ruta para mostrar resultados de Groq (modificada para pasar el usuario)
+Route::get('/groq-response', function() {
+    $user = Auth::user();
+    return view('groq-response', compact('user'));
+})->name('groq.show-response')->middleware('auth');
+
+Route::put('/profile/update', [AstrologicalUserController::class, 'update'])->name('profile.update')->middleware('auth');

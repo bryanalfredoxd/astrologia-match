@@ -9,33 +9,27 @@ class DatosAstralesBasicos extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'id_datos_astrales';
+    protected $table = 'datos_astrales_basicos';
+    protected $primaryKey = 'id_datos_astrales'; // Si no es 'id' por defecto
+
+    // ¡Añade esta línea!
+    public $timestamps = false; // Indica a Eloquent que no use created_at y updated_at
 
     protected $fillable = [
         'id_usuario',
         'id_signo_solar',
-        'id_signo_lunar',
-        'id_ascendente',
         'fecha_calculo',
     ];
 
-    public function user()
+    // Relación con AstrologicalUser
+    public function astrologicalUser()
     {
         return $this->belongsTo(AstrologicalUser::class, 'id_usuario');
     }
 
+    // Relación con SignoZodiacal
     public function signoSolar()
     {
-        return $this->belongsTo(SignoZodiacal::class, 'id_signo_solar', 'id_signo');
-    }
-
-    public function signoLunar()
-    {
-        return $this->belongsTo(SignoZodiacal::class, 'id_signo_lunar', 'id_signo');
-    }
-
-    public function ascendente()
-    {
-        return $this->belongsTo(SignoZodiacal::class, 'id_ascendente', 'id_signo');
+        return $this->belongsTo(SignoZodiacal::class, 'id_signo_solar');
     }
 }
