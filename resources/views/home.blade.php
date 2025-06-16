@@ -44,7 +44,7 @@
                     <h3 class="text-lg md:text-xl font-semibold text-center mb-2 md:mb-3 text-gray-800">Regístrate</h3>
                     <p class="text-sm md:text-base text-gray-600 text-center">Proporciona tus datos básicos y astrológicos.</p>
                     <div class="mt-4 text-center">
-                        <a href="#" class="text-blue-500 hover:text-blue-700 text-sm flex items-center justify-center">
+                        <a href="{{ route('register') }}" class="text-blue-500 hover:text-blue-700 text-sm flex items-center justify-center">
                             <i class="fas fa-arrow-right mr-1"></i> Más info
                         </a>
                     </div>
@@ -58,7 +58,7 @@
                     <h3 class="text-lg md:text-xl font-semibold text-center mb-2 md:mb-3 text-gray-800">Carta Astral</h3>
                     <p class="text-sm md:text-base text-gray-600 text-center">Calculamos tu signo solar, lunar y ascendente.</p>
                     <div class="mt-4 text-center">
-                        <a href="#" class="text-purple-500 hover:text-purple-700 text-sm flex items-center justify-center">
+                        <a href="{{ route('carta_astral') }}" class="text-purple-500 hover:text-purple-700 text-sm flex items-center justify-center">
                             <i class="fas fa-arrow-right mr-1"></i> Más info
                         </a>
                     </div>
@@ -72,7 +72,7 @@
                     <h3 class="text-lg md:text-xl font-semibold text-center mb-2 md:mb-3 text-gray-800">Encuentra</h3>
                     <p class="text-sm md:text-base text-gray-600 text-center">Conoce personas compatibles cerca de ti.</p>
                     <div class="mt-4 text-center">
-                        <a href="#" class="text-yellow-500 hover:text-yellow-700 text-sm flex items-center justify-center">
+                        <a href="{{ route('compatibilidad_general') }}" class="text-yellow-500 hover:text-yellow-700 text-sm flex items-center justify-center">
                             <i class="fas fa-arrow-right mr-1"></i> Más info
                         </a>
                     </div>

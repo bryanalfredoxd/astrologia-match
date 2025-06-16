@@ -67,3 +67,23 @@ Route::get('/groq-response', function() {
 })->name('groq.show-response')->middleware('auth');
 
 Route::put('/profile/update', [AstrologicalUserController::class, 'update'])->name('profile.update')->middleware('auth');
+
+Route::get('/carta_astral', function () {
+    return view('carta_astral');
+})->name('carta_astral');
+
+Route::get('/compatibilidades', function () {
+    return view('compatibilidad_general');
+})->name('compatibilidad_general');
+
+Route::get('/usuarios_compatibles', function () {
+    return view('others.usuario_compatibles');
+})->name('usuarios_compatibles');
+
+Route::get('/chat', function () {
+    return view('chat');
+})->name('chat')->middleware('auth');
+
+Route::get('/matchs', function () {
+    return view('matchs');
+})->name('matchs')->middleware('auth');
