@@ -6,11 +6,12 @@ use App\Models\AstrologicalUser;
 use App\Models\Compatibilidad;
 use App\Models\UserDistance;
 use App\Models\InteraccionPerfil;
-use App\Models\Emparejamientos;
+use App\Models\Emparejamientos; // Modelo de emparejamientos
+use App\Models\Mensaje; // Modelo de mensajes
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon; // Para calcular la edad
+use Carbon\Carbon;
 
 class MatchController extends Controller
 {
@@ -31,7 +32,6 @@ class MatchController extends Controller
         }
 
         // Obtener IDs de usuarios con los que ya se ha interactuado (like o dislike)
-        // No incluyas 'vista' aquí, ya que ver un perfil no debería excluirlo permanentemente
         $interactedUserIds = InteraccionPerfil::where('id_emisor', $currentUser->id)
                                              ->whereIn('tipo_interaccion', ['like', 'dislike'])
                                              ->pluck('id_receptor')
@@ -66,7 +66,6 @@ class MatchController extends Controller
             }
 
             // Obtener la distancia geográfica
-            // Asegurarse de que el orden de los IDs sea el mismo que en user_distances (menor primero)
             $distanceRecord = UserDistance::where(function ($query) use ($currentUser, $otherUser) {
                 $query->where('id_usuario1', min($currentUser->id, $otherUser->id))
                       ->where('id_usuario2', max($currentUser->id, $otherUser->id));
@@ -186,5 +185,196 @@ class MatchController extends Controller
         }
 
         return response()->json(['message' => $message, 'is_match' => $isMatch]);
+    }
+
+    /**
+     * Obtiene y devuelve la lista de usuarios con los que el usuario actual ha hecho match.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getActiveMatches(Request $request)
+    {
+        $currentUser = Auth::user();
+
+        if (!$currentUser) {
+            return response()->json(['error' => 'Usuario no autenticado.'], 401);
+        }
+
+        // Obtener todos los emparejamientos activos donde el usuario actual es usuario1_id o usuario2_id
+        $activeMatches = Emparejamientos::where(function ($query) use ($currentUser) {
+                                            $query->where('usuario1_id', $currentUser->id)
+                                                  ->orWhere('usuario2_id', $currentUser->id);
+                                        })
+                                        ->where('estado', 'activo')
+                                        ->get();
+
+        $matchedUsersData = [];
+        foreach ($activeMatches as $match) {
+            $otherUserId = ($match->usuario1_id === $currentUser->id) ? $match->usuario2_id : $match->usuario1_id;
+            $otherUser = AstrologicalUser::find($otherUserId);
+
+            if ($otherUser) {
+                $matchedUsersData[] = [
+                    'id' => $otherUser->id,
+                    'nombre_completo' => $otherUser->nombre_completo,
+                    'foto_perfil_url' => $otherUser->foto_perfil_url,
+                    'last_message' => $this->getLastMessage($currentUser->id, $otherUser->id), // Obtener el último mensaje
+                    'unread_messages' => $this->getUnreadMessageCount($currentUser->id, $otherUser->id), // Contar mensajes no leídos
+                    'fecha_emparejamiento' => $match->fecha_emparejamiento,
+                ];
+            }
+        }
+
+        // Opcional: Ordenar los matches por el último mensaje o fecha de emparejamiento
+        // Por ejemplo, por fecha del último mensaje (más reciente primero) o por fecha de emparejamiento.
+        usort($matchedUsersData, function($a, $b) {
+            $dateA = $a['last_message']['fecha_envio'] ?? $a['fecha_emparejamiento'];
+            $dateB = $b['last_message']['fecha_envio'] ?? $b['fecha_emparejamiento'];
+            return strtotime($dateB) - strtotime($dateA);
+        });
+
+
+        return response()->json(['matches' => $matchedUsersData]);
+    }
+
+    /**
+     * Obtiene los mensajes entre dos usuarios.
+     *
+     * @param Request $request
+     * @param int $targetUserId El ID del otro usuario en la conversación.
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getMessages(Request $request, int $targetUserId)
+    {
+        $currentUser = Auth::user();
+
+        if (!$currentUser) {
+            return response()->json(['error' => 'Usuario no autenticado.'], 401);
+        }
+
+        // Verificar que exista un match activo entre los dos usuarios
+        $matchExists = Emparejamientos::where('estado', 'activo')
+                                    ->where(function($query) use ($currentUser, $targetUserId) {
+                                        $query->where(function($q) use ($currentUser, $targetUserId) {
+                                            $q->where('usuario1_id', $currentUser->id)
+                                              ->where('usuario2_id', $targetUserId);
+                                        })->orWhere(function($q) use ($currentUser, $targetUserId) {
+                                            $q->where('usuario1_id', $targetUserId)
+                                              ->where('usuario2_id', $currentUser->id);
+                                        });
+                                    })
+                                    ->exists();
+
+        if (!$matchExists) {
+            return response()->json(['error' => 'No hay un match activo con este usuario.'], 403);
+        }
+
+        // Obtener mensajes entre los dos usuarios, ordenados por fecha de envío
+        $messages = Mensaje::where(function ($query) use ($currentUser, $targetUserId) {
+                                $query->where('id_remitente', $currentUser->id)
+                                      ->where('id_receptor', $targetUserId);
+                            })
+                            ->orWhere(function ($query) use ($currentUser, $targetUserId) {
+                                $query->where('id_remitente', $targetUserId)
+                                      ->where('id_receptor', $currentUser->id);
+                            })
+                            ->orderBy('fecha_envio', 'asc')
+                            ->get();
+
+        // Marcar mensajes como leídos si el receptor es el usuario actual
+        Mensaje::where('id_receptor', $currentUser->id)
+               ->where('id_remitente', $targetUserId)
+               ->where('leido', false)
+               ->update(['leido' => true]);
+
+        return response()->json(['messages' => $messages]);
+    }
+
+    /**
+     * Envía un nuevo mensaje.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function sendMessage(Request $request)
+    {
+        $currentUser = Auth::user();
+
+        if (!$currentUser) {
+            return response()->json(['message' => 'Usuario no autenticado.'], 401);
+        }
+
+        $validatedData = $request->validate([
+            'id_receptor' => 'required|exists:astrological_users,id',
+            'contenido' => 'required|string|max:1000',
+        ]);
+
+        $idReceptor = $validatedData['id_receptor'];
+        $contenido = $validatedData['contenido'];
+
+        // Verificar que exista un match activo entre los dos usuarios antes de permitir el envío del mensaje
+        $matchExists = Emparejamientos::where('estado', 'activo')
+                                    ->where(function($query) use ($currentUser, $idReceptor) {
+                                        $query->where(function($q) use ($currentUser, $idReceptor) {
+                                            $q->where('usuario1_id', $currentUser->id)
+                                              ->where('usuario2_id', $idReceptor);
+                                        })->orWhere(function($q) use ($currentUser, $idReceptor) {
+                                            $q->where('usuario1_id', $idReceptor)
+                                              ->where('usuario2_id', $currentUser->id);
+                                        });
+                                    })
+                                    ->exists();
+
+        if (!$matchExists) {
+            return response()->json(['error' => 'No tienes un match activo con este usuario para enviar mensajes.'], 403);
+        }
+
+        $message = Mensaje::create([
+            'id_remitente' => $currentUser->id,
+            'id_receptor' => $idReceptor,
+            'contenido' => $contenido,
+            'fecha_envio' => now(),
+            'leido' => false,
+        ]);
+
+        return response()->json(['message' => 'Mensaje enviado', 'data' => $message], 201);
+    }
+
+
+    /**
+     * Helper: Obtiene el último mensaje entre dos usuarios.
+     * @param int $userId1
+     * @param int $userId2
+     * @return array|null
+     */
+    protected function getLastMessage(int $userId1, int $userId2): ?array
+    {
+        $message = Mensaje::where(function ($query) use ($userId1, $userId2) {
+                                $query->where('id_remitente', $userId1)
+                                      ->where('id_receptor', $userId2);
+                            })
+                            ->orWhere(function ($query) use ($userId1, $userId2) {
+                                $query->where('id_remitente', $userId2)
+                                      ->where('id_receptor', $userId1);
+                            })
+                            ->orderBy('fecha_envio', 'desc')
+                            ->first();
+
+        return $message ? $message->toArray() : null;
+    }
+
+    /**
+     * Helper: Cuenta los mensajes no leídos para el usuario actual de un remitente específico.
+     * @param int $currentUserId
+     * @param int $senderId
+     * @return int
+     */
+    protected function getUnreadMessageCount(int $currentUserId, int $senderId): int
+    {
+        return Mensaje::where('id_receptor', $currentUserId)
+                      ->where('id_remitente', $senderId)
+                      ->where('leido', false)
+                      ->count();
     }
 }

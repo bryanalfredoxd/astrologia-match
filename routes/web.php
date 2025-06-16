@@ -85,9 +85,18 @@ Route::get('/usuarios_compatibles', function () {
     return view('others.usuario_compatibles');
 })->name('usuarios_compatibles');
 
-Route::get('/chat', function () {
-    return view('chat');
-})->name('chat')->middleware('auth');
+Route::middleware('auth')->group(function () {
+
+    // Rutas para la funcionalidad de chat
+    Route::get('/api/chats/matches', [MatchController::class, 'getActiveMatches'])->name('chats.get_active_matches');
+    Route::get('/api/chats/messages/{targetUserId}', [MatchController::class, 'getMessages'])->name('chats.get_messages');
+    Route::post('/api/chats/send-message', [MatchController::class, 'sendMessage'])->name('chats.send_message');
+
+    // La ruta para la vista de chat (ya debe existir, solo para referencia)
+    Route::get('/chat', function () {
+        return view('chat');
+    })->name('chat')->middleware('auth');
+});
 
 Route::middleware('auth')->group(function () {
     // Ruta para obtener los matches potenciales
