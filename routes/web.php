@@ -6,7 +6,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Models\AstrologicalUser; // Asegúrate de importar el modelo
 use App\Http\Controllers\GroqAstrologyController;
-use App\Jobs\CalculateUserDistances;
+use App\Jobs\CalculateUserDistances; // Ya lo tienes
+use App\Jobs\CalculateCompatibilityMatches; // ¡Añade esta línea!
+use Illuminate\Support\Facades\Log; // Para el Log::warning en la ruta
 
 // Página principal con splash screen
 Route::get('/', function () {
@@ -36,11 +38,13 @@ Route::get('/astromatch', function () {
 
         // *** AÑADIR ESTA LÍNEA PARA DESPACHAR EL JOB ***
         // Despachar el job para calcular las distancias en segundo plano
-        // Se pasa una copia del usuario para evitar problemas de serialización
-        CalculateUserDistances::dispatch(clone $user);
-        
-    } else if (!Auth::check()) {
-        return redirect()->route('login'); // Redirige a la ruta de login
+        // Se asegura de que el usuario tenga latitud y longitud antes de despachar
+        if (!is_null($user->latitud) && !is_null($user->longitud)) {
+            \App\Jobs\CalculateUserDistances::dispatch($user);
+            \App\Jobs\CalculateCompatibilityMatches::dispatch($user); // ¡Nuevo Job aquí!
+        } else {
+            Log::warning('Usuario ' . $user->id . ' no tiene coordenadas para calcular distancias o compatibilidad por proximidad.');
+        }
     }
 
     // Pasar el usuario a la vista 'astromatch'
