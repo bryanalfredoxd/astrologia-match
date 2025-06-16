@@ -9,6 +9,7 @@ use App\Http\Controllers\GroqAstrologyController;
 use App\Jobs\CalculateUserDistances; // Ya lo tienes
 use App\Jobs\CalculateCompatibilityMatches; // ¡Añade esta línea!
 use Illuminate\Support\Facades\Log; // Para el Log::warning en la ruta
+use App\Http\Controllers\MatchController;
 
 // Página principal con splash screen
 Route::get('/', function () {
@@ -88,6 +89,27 @@ Route::get('/chat', function () {
     return view('chat');
 })->name('chat')->middleware('auth');
 
-Route::get('/matchs', function () {
-    return view('matchs');
-})->name('matchs')->middleware('auth');
+Route::middleware('auth')->group(function () {
+    // Ruta para obtener los matches potenciales
+    Route::get('/api/matches', [MatchController::class, 'getPotentialMatches'])->name('matches.get');
+
+    // Rutas para procesar las interacciones (like/dislike)
+    Route::post('/api/matches/{targetUserId}/interact/{interactionType}', [MatchController::class, 'processInteraction'])->name('matches.interact');
+
+    // La ruta para la vista de matches (ya debe existir, solo para referencia)
+    Route::get('/matchs', function () {
+        return view('matchs');
+    })->name('matchs');
+
+    // Nueva ruta para la pantalla de perfil del match
+    Route::get('/matched-profile/{userId}', function ($userId) {
+        $user = AstrologicalUser::find($userId);
+
+        if (!$user) {
+            // Manejar caso donde el usuario no se encuentra (ej. redirigir a 404 o a la lista de matches)
+            return redirect()->route('matchs')->with('error', 'Perfil de usuario no encontrado.');
+        }
+
+        return view('matched_profile', compact('user'));
+    })->name('matched.profile');
+});
