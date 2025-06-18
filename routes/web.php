@@ -81,9 +81,8 @@ Route::get('/compatibilidades', function () {
     return view('compatibilidad_general');
 })->name('compatibilidad_general');
 
-Route::get('/usuarios_compatibles', function () {
-    return view('others.usuario_compatibles');
-})->name('usuarios_compatibles');
+// RUTA MODIFICADA: Ahora apunta al controlador
+Route::get('/usuarios_compatibles', [AstrologicalUserController::class, 'showCompatibleUsers'])->name('usuarios_compatibles');
 
 Route::middleware('auth')->group(function () {
 

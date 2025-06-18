@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<section class="bg-[#0A0E2A] text-white min-h-screen flex items-center justify-center p-4 py-8 relative overflow-hidden">
+<section class="bg-astral text-white min-h-screen flex items-center justify-center p-4 py-8 relative overflow-hidden">
     {{-- Decorative elements for cosmic background (optional, for more flair) --}}
     <div class="absolute top-0 left-0 w-48 h-48 bg-[#4A0E7B] rounded-full mix-blend-screen opacity-10 blur-3xl animate-blob -z-10"></div>
     <div class="absolute bottom-0 right-0 w-48 h-48 bg-[#8A2BE2] rounded-full mix-blend-screen opacity-10 blur-3xl animate-blob animation-delay-2000 -z-10"></div>
@@ -14,7 +14,7 @@
 
         {{-- Left Zodiac Cards (hidden on mobile, visible on large screens and up, stacked vertically) --}}
         <div class="hidden lg:flex lg:flex-col lg:gap-4 flex-shrink-0 w-64"> {{-- Changed to flex-col and added fixed width --}}
-            <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-10 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
+            <div class="bg-[#0A0E2A] p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-50 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
                     <img src="{{ asset('images/zodiaco/aries.png') }}" alt="Aries" class="w-full h-full object-contain" loading="lazy">
                 </div>
@@ -26,7 +26,7 @@
                 </div>
             </div>
             
-            <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-10 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
+            <div class="bg-[#0A0E2A] p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-50 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
                     <img src="{{ asset('images/zodiaco/tauro.png') }}" alt="Tauro" class="w-full h-full object-contain">
                 </div>
@@ -38,7 +38,7 @@
                 </div>
             </div>
             
-            <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-10 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
+            <div class="bg-[#0A0E2A] p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-50 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
                     <img src="{{ asset('images/zodiaco/géminis.png') }}" alt="Géminis" class="w-full h-full object-contain">
                 </div>
@@ -50,7 +50,7 @@
                 </div>
             </div>
             
-            <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-10 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
+            <div class="bg-[#0A0E2A] p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-50 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
                     <img src="{{ asset('images/zodiaco/cáncer.png') }}" alt="Cáncer" class="w-full h-full object-contain">
                 </div>
@@ -62,7 +62,7 @@
                 </div>
             </div>
             
-            <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-10 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
+            <div class="bg-[#0A0E2A] p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-50 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
                     <img src="{{ asset('images/zodiaco/leo.png') }}" alt="Leo" class="w-full h-full object-contain">
                 </div>
@@ -73,8 +73,8 @@
                     <i class="fas fa-fire text-red-500 text-2xl md:text-3xl"></i>
                 </div>
             </div>
-            
-            <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-10 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
+
+            <div class="bg-[#0A0E2A] p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-50 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
                     <img src="{{ asset('images/zodiaco/virgo.png') }}" alt="Virgo" class="w-full h-full object-contain">
                 </div>
@@ -88,7 +88,7 @@
         </div>
 
         {{-- Main Registration Form --}}
-        <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden w-full max-w-lg border border-[#4A0E7B] border-opacity-40 flex-shrink-0">
+        <div class="bg-[#0A0E2A] backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden w-full max-w-lg border border-[#4A0E7B] border-opacity-40 flex-shrink-0">
             <div class="bg-astral-header p-8 text-center relative">
                 <div class="flex justify-center mb-4">
                     <i class="fas fa-star text-[#FFD700] text-5xl animate-pulse"></i>
@@ -343,7 +343,7 @@
 
         {{-- Right Zodiac Cards (hidden on mobile, visible on large screens and up, stacked vertically) --}}
         <div class="hidden lg:flex lg:flex-col lg:gap-4 flex-shrink-0 w-64"> {{-- Changed to flex-col and added fixed width --}}
-            <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-10 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
+            <div class="bg-[#0A0E2A] p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-50 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
                     <img src="{{ asset('images/zodiaco/libra.png') }}" alt="Libra" class="w-full h-full object-contain">
                 </div>
@@ -354,8 +354,8 @@
                     <i class="fas fa-wind text-blue-500 text-2xl md:text-3xl"></i>
                 </div>
             </div>
-            
-            <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-10 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
+
+            <div class="bg-[#0A0E2A] p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-50 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
                     <img src="{{ asset('images/zodiaco/escorpio.png') }}" alt="Scorpio" class="w-full h-full object-contain">
                 </div>
@@ -366,8 +366,8 @@
                     <i class="fas fa-water text-indigo-500 text-2xl md:text-3xl"></i>
                 </div>
             </div>
-            
-            <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-10 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
+
+            <div class="bg-[#0A0E2A] p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-50 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
                     <img src="{{ asset('images/zodiaco/sagitario.png') }}" alt="Sagitario" class="w-full h-full object-contain">
                 </div>
@@ -378,8 +378,8 @@
                     <i class="fas fa-fire text-red-500 text-2xl md:text-3xl"></i>
                 </div>
             </div>
-            
-            <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-10 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
+
+            <div class="bg-[#0A0E2A] p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-50 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
                     <img src="{{ asset('images/zodiaco/capricornio.png') }}" alt="Capricorn" class="w-full h-full object-contain">
                 </div>
@@ -390,8 +390,8 @@
                     <i class="fas fa-leaf text-emerald-500 text-2xl md:text-3xl"></i>
                 </div>
             </div>
-            
-            <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-10 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
+
+            <div class="bg-[#0A0E2A] p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-50 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
                     <img src="{{ asset('images/zodiaco/acuario.png') }}" alt="Aquarius" class="w-full h-full object-contain">
                 </div>
@@ -402,8 +402,8 @@
                     <i class="fas fa-wind text-blue-500 text-2xl md:text-3xl"></i>
                 </div>
             </div>
-            
-            <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-10 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
+
+            <div class="bg-[#0A0E2A] p-4 rounded-xl shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-1 text-center bg-opacity-50 backdrop-blur-sm border border-[#4A0E7B] border-opacity-40">
                 <div class="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mx-auto mb-3 overflow-hidden">
                     <img src="{{ asset('images/zodiaco/piscis.png') }}" alt="Pisces" class="w-full h-full object-contain">
                 </div>

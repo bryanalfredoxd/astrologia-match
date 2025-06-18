@@ -70,7 +70,7 @@
                         <i class="fas fa-heart text-yellow-500 text-xl md:text-2xl"></i>
                     </div>
                     <h3 class="text-lg md:text-xl font-semibold text-center mb-2 md:mb-3 text-gray-800">Encuentra</h3>
-                    <p class="text-sm md:text-base text-gray-600 text-center">Conoce personas compatibles cerca de ti.</p>
+                    <p class="text-sm md:text-base text-gray-600 text-center">Conoce personas compatibles segun tus criterios.</p>
                     <div class="mt-4 text-center">
                         <a href="{{ route('compatibilidad_general') }}" class="text-yellow-500 hover:text-yellow-700 text-sm flex items-center justify-center">
                             <i class="fas fa-arrow-right mr-1"></i> Más info

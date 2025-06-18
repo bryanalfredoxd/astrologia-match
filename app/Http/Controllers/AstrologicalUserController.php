@@ -155,4 +155,185 @@ class AstrologicalUserController extends Controller
         return redirect()->route('astromatch')->with('success', 'Perfil actualizado correctamente.');
     }
 
+    /**
+     * Muestra el número de usuarios compatibles basado en los parámetros de la solicitud.
+     */
+    public function showCompatibleUsers(Request $request)
+    {
+        // Validación de los parámetros recibidos del formulario
+        $validatedData = $request->validate([
+            'signo' => 'required|string|max:50',
+            'genero' => 'required|string|in:masculino,femenino',
+            'orientacion' => 'required|string|in:heterosexual,homosexual,bisexual',
+            'busca' => 'required|string|in:hombres,mujeres,ambos',
+            'edad' => 'required|integer|min:18|max:100',
+        ]);
+
+        $signoNombre = $validatedData['signo'];
+        $generoUsuario = $validatedData['genero'];
+        $orientacionUsuario = $validatedData['orientacion'];
+        $buscaGenero = $validatedData['busca'];
+        $edadUsuario = $validatedData['edad'];
+
+        // Obtener el ID del signo zodiacal del usuario actual basado en el nombre
+        $signoId = SignoZodiacal::where('nombre_signo', $signoNombre)->value('id_signo');
+
+        if (!$signoId) {
+            // Manejar el caso donde el signo no se encuentra (debería existir si el formulario es validado)
+            return redirect()->back()->with('error', 'Signo zodiacal no encontrado.');
+        }
+
+        // Construir la consulta para encontrar usuarios compatibles
+        $query = AstrologicalUser::query();
+
+        // 1. Filtrar por signo zodiacal (usando la tabla pivot datos_astrales_basicos)
+        $query->whereHas('datosAstralesBasicos', function ($q) use ($signoId) {
+            $q->where('id_signo_solar', $signoId);
+        });
+
+        // 2. Filtrar por género y "busca"
+        // Si el usuario busca hombres, y su orientación es homosexual o bisexual, busca hombres.
+        // Si el usuario busca mujeres, y su orientación es heterosexual o bisexual, busca mujeres.
+        // Si el usuario busca ambos, entonces busca hombres y mujeres.
+
+        // Convertir los valores de 'genero' y 'busca' a los que están en la base de datos
+        // Asumiendo que en DB 'genero' es 'Masculino' o 'Femenino' (capitalizado)
+        $generoDB = ($generoUsuario === 'masculino') ? 'Masculino' : 'Femenino';
+
+        // Lógica para 'busca':
+        if ($buscaGenero === 'hombres') {
+            $query->where('genero', 'Masculino');
+        } elseif ($buscaGenero === 'mujeres') {
+            $query->where('genero', 'Femenino');
+        }
+        // Si busca 'ambos', no filtramos por género aquí, ya que incluimos ambos.
+
+        // 3. Filtrar por orientación sexual del usuario compatible
+        // Aquí la lógica puede ser más compleja y depender de cómo defines la compatibilidad.
+        // Por ejemplo, un heterosexual busca heterosexuales del género opuesto.
+        // Un homosexual busca homosexuales del mismo género.
+        // Un bisexual puede buscar de ambas orientaciones.
+
+        // Por simplicidad, solo filtramos por la orientación sexual del 'target'
+        // que es compatible con la orientación y búsqueda del usuario.
+
+        // Ejemplo simple: Si el usuario es heterosexual y busca mujeres, la mujer debe ser heterosexual o bisexual.
+        // Esto es una simplificación, la compatibilidad sexual real es más matizada.
+
+        // Para esta implementación básica, vamos a buscar usuarios que se "buscan" mutuamente
+        // o que su orientación los hace compatibles con la búsqueda del otro.
+
+        // Por ahora, solo usaremos los parámetros del formulario para buscar usuarios con esas características.
+        // Por ejemplo, si el usuario es "masculino", "heterosexual" y busca "mujeres" de "Aries" de "25" años:
+        // Buscamos mujeres, que sean Aries, y con una edad cercana.
+
+        // La siguiente parte asume que queremos encontrar usuarios que coincidan con la *descripción* del perfil
+        // que el usuario está buscando. No es una compatibilidad mutua.
+        // Si quiero buscar a hombres:
+        // $query->where('genero', 'Masculino');
+        // $query->where('orientacion_sexual', 'Heterosexual'); // (Si el que busca es mujer)
+        // $query->where('orientacion_sexual', 'Homosexual'); // (Si el que busca es hombre)
+        // Esto es donde se complica la lógica de emparejamiento real.
+
+        // Para este ejercicio, vamos a buscar usuarios que *coincidan con los criterios deseados por el que busca*.
+        // Por ejemplo, si el usuario dice que "busca" "hombres", filtraremos por 'genero' = 'Masculino'.
+        // Si el usuario dice que su 'orientacion' es 'heterosexual' y 'busca' 'mujeres',
+        // entonces buscaremos mujeres cuya 'orientacion_sexual' sea 'heterosexual' o 'bisexual'.
+
+        // Si 'busca' es 'hombres':
+        if ($buscaGenero === 'hombres') {
+            $query->where('genero', 'Masculino');
+            // Si el usuario es heterosexual y busca hombres, no es compatible con hombres heterosexuales.
+            // Si el usuario es homosexual y busca hombres, busca hombres homosexuales o bisexuales.
+            if ($orientacionUsuario === 'homosexual') {
+                $query->whereIn('orientacion_sexual', ['Homosexual', 'Bisexual', 'Pansexual']);
+            } elseif ($orientacionUsuario === 'bisexual') {
+                // Un bisexual que busca hombres, puede buscar homosexuales o bisexuales
+                 $query->whereIn('orientacion_sexual', ['Homosexual', 'Bisexual', 'Pansexual']);
+            } else { // Heterosexual o Asexual buscando hombres (menos común en apps de citas, pero posible)
+                 // Puedes decidir si los heterosexuales buscan hombres (serían mujeres)
+                 // o si es un error lógico para la búsqueda.
+                 // Para un hombre heterosexual buscando hombres, no habría compatibilidad.
+                 // Para una mujer heterosexual buscando hombres, buscariamos hombres heterosexuales o bisexuales.
+                if ($generoUsuario === 'femenino') { // Una mujer heterosexual buscando hombres
+                     $query->whereIn('orientacion_sexual', ['Heterosexual', 'Bisexual', 'Pansexual']);
+                }
+            }
+        }
+        // Si 'busca' es 'mujeres':
+        elseif ($buscaGenero === 'mujeres') {
+            $query->where('genero', 'Femenino');
+            if ($orientacionUsuario === 'heterosexual') {
+                $query->whereIn('orientacion_sexual', ['Heterosexual', 'Bisexual', 'Pansexual']);
+            } elseif ($orientacionUsuario === 'bisexual') {
+                $query->whereIn('orientacion_sexual', ['Heterosexual', 'Bisexual', 'Pansexual']);
+            } else { // Homosexual o Asexual buscando mujeres
+                if ($generoUsuario === 'masculino') { // Un hombre homosexual buscando mujeres (raro)
+                    // Podrías no encontrar resultados aquí si la lógica es estricta.
+                } elseif ($generoUsuario === 'femenino') { // Una mujer homosexual buscando mujeres
+                    $query->whereIn('orientacion_sexual', ['Homosexual', 'Bisexual', 'Pansexual']);
+                }
+            }
+        }
+        // Si 'busca' es 'ambos':
+        elseif ($buscaGenero === 'ambos') {
+            // Si el usuario es heterosexual, busca el género opuesto con orientaciones compatibles.
+            // Si el usuario es homosexual, busca el mismo género con orientaciones compatibles.
+            // Si el usuario es bisexual, busca ambos géneros con orientaciones compatibles.
+
+            $query->where(function ($q) use ($generoUsuario, $orientacionUsuario) {
+                if ($orientacionUsuario === 'heterosexual') {
+                    // Si el usuario es hombre heterosexual, busca mujeres heterosexuales/bisexuales.
+                    // Si el usuario es mujer heterosexual, busca hombres heterosexuales/bisexuales.
+                    if ($generoUsuario === 'masculino') { // Hombre heterosexual busca mujeres
+                        $q->where('genero', 'Femenino')
+                          ->whereIn('orientacion_sexual', ['Heterosexual', 'Bisexual', 'Pansexual']);
+                    } else { // Mujer heterosexual busca hombres
+                        $q->where('genero', 'Masculino')
+                          ->whereIn('orientacion_sexual', ['Heterosexual', 'Bisexual', 'Pansexual']);
+                    }
+                } elseif ($orientacionUsuario === 'homosexual') {
+                    // Si el usuario es hombre homosexual, busca hombres homosexuales/bisexuales.
+                    // Si el usuario es mujer homosexual, busca mujeres homosexuales/bisexuales.
+                    if ($generoUsuario === 'masculino') { // Hombre homosexual busca hombres
+                        $q->where('genero', 'Masculino')
+                          ->whereIn('orientacion_sexual', ['Homosexual', 'Bisexual', 'Pansexual']);
+                    } else { // Mujer homosexual busca mujeres
+                        $q->where('genero', 'Femenino')
+                          ->whereIn('orientacion_sexual', ['Homosexual', 'Bisexual', 'Pansexual']);
+                    }
+                } elseif ($orientacionUsuario === 'bisexual') {
+                    // Un bisexual puede buscar tanto hombres como mujeres con orientaciones que los incluyan.
+                    $q->where(function($subQ) {
+                        $subQ->where('genero', 'Masculino')
+                             ->whereIn('orientacion_sexual', ['Heterosexual', 'Homosexual', 'Bisexual', 'Pansexual']);
+                    })->orWhere(function($subQ) {
+                        $subQ->where('genero', 'Femenino')
+                             ->whereIn('orientacion_sexual', ['Heterosexual', 'Homosexual', 'Bisexual', 'Pansexual']);
+                    });
+                }
+            });
+        }
+
+
+        // 4. Filtrar por edad
+        // Podrías querer un rango de edad, por ejemplo, +/- 5 años de la edad del usuario.
+        $minEdad = max(18, $edadUsuario - 5);
+        $maxEdad = min(100, $edadUsuario + 5);
+
+        // Calculate age based on fecha_nacimiento
+        $query->whereRaw('TIMESTAMPDIFF(YEAR, fecha_nacimiento, CURDATE()) BETWEEN ? AND ?', [$minEdad, $maxEdad]);
+
+
+        // Excluir al propio usuario si está autenticado
+        if (Auth::check()) {
+            $query->where('id', '!=', Auth::id());
+        }
+
+        // Obtener el total de usuarios compatibles
+        $totalCompatibles = $query->count();
+
+        // Pasar el total a la vista
+        return view('others.usuario_compatibles', compact('totalCompatibles'));
+    }
 }

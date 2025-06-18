@@ -201,8 +201,8 @@
             </div>
             
             <div class="mt-6 text-center">
-                <a href="#" class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 text-sm font-medium">
-                    <i class="fas fa-chart-bar mr-2"></i> Ver mi compatibilidad detallada
+                <a href="{{ route('carta_astral') }}" class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 text-sm font-medium">
+                    <i class="fas fa-chart-bar mr-2"></i> Conocer más
                 </a>
             </div>
         </div>
