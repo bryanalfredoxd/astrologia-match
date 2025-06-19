@@ -57,8 +57,14 @@ class MatchController extends Controller
                 continue;
             }
 
-            // Obtener el objeto del "otro usuario"
-            $otherUser = AstrologicalUser::find($otherUserId);
+            // Obtener el objeto del "otro usuario" con las relaciones astrológicas eager loaded
+            // y la relación de imágenes de perfil adicionales.
+            $otherUser = AstrologicalUser::with([
+                'datosAstralesBasicos.signoSolar',
+                'groqAstrologyData.signoLunar',
+                'groqAstrologyData.signoAscendente',
+                'imagenesPerfil' // Cargar las imágenes de perfil adicionales
+            ])->find($otherUserId);
 
             if (!$otherUser) {
                 Log::warning("Usuario con ID {$otherUserId} no encontrado en getPotentialMatches, omitiendo.");
@@ -84,257 +90,171 @@ class MatchController extends Controller
                 try {
                     $edad = Carbon::parse($otherUser->fecha_nacimiento)->age;
                 } catch (\Exception $e) {
-                    Log::error("Error calculando edad para usuario {$otherUser->id}: " . $e->getMessage());
+                    Log::error("Error al calcular la edad para el usuario ID {$otherUser->id}: " . $e->getMessage());
                 }
             }
 
+            // Preparar los datos astrológicos para el JSON
+            $solarSign = $otherUser->datosAstralesBasicos->signoSolar ?? null;
+            $lunarSign = $otherUser->groqAstrologyData->signoLunar ?? null;
+            $ascendantSign = $otherUser->groqAstrologyData->signoAscendente ?? null;
 
-            // Añadir el match a la colección
+            // Preparar las URLs de las imágenes de perfil adicionales
+            $additionalImages = $otherUser->imagenesPerfil->map(function($image) {
+                return ['url_imagen' => $image->url_imagen, 'orden' => $image->orden];
+            })->sortBy('orden')->values()->all(); // Asegurar que estén ordenadas
+
             $potentialMatches->push([
                 'id' => $otherUser->id,
-                'compatibilidad_id' => $compat->id_compatibilidad,
                 'nombre_completo' => $otherUser->nombre_completo,
+                'email' => $otherUser->email,
+                'fecha_nacimiento' => $otherUser->fecha_nacimiento,
                 'edad' => $edad,
-                'biografia' => $otherUser->biografia,
-                'foto_perfil_url' => $otherUser->foto_perfil_url,
                 'lugar_nacimiento' => $otherUser->lugar_nacimiento,
                 'genero' => $otherUser->genero,
                 'orientacion_sexual' => $otherUser->orientacion_sexual,
+                'latitud' => $otherUser->latitud,
+                'longitud' => $otherUser->longitud,
+                'biografia' => $otherUser->biografia,
+                'foto_perfil_url' => $otherUser->foto_perfil_url,
                 'puntuacion_general' => $compat->puntuacion_general,
                 'descripcion_breve' => $compat->descripcion_breve,
                 'analisis_detallado' => $compat->analisis_detallado,
-                'distancia_km' => $distance,
+                'distancia_km' => round($distance), // Redondear la distancia
+                'signos' => [
+                    'solar' => $solarSign ? [
+                        'nombre_signo' => $solarSign->nombre_signo,
+                        'elemento' => $solarSign->elemento,
+                        'modalidad' => $solarSign->modalidad,
+                    ] : null,
+                    'lunar' => $lunarSign ? [
+                        'nombre_signo' => $lunarSign->nombre_signo,
+                        'elemento' => $lunarSign->elemento,
+                        'modalidad' => $lunarSign->modalidad,
+                    ] : null,
+                    'ascendente' => $ascendantSign ? [
+                        'nombre_signo' => $ascendantSign->nombre_signo,
+                        'elemento' => $ascendantSign->elemento,
+                        'modalidad' => $ascendantSign->modalidad,
+                    ] : null,
+                ],
+                'imagenes_perfil' => $additionalImages, // Incluir las imágenes adicionales
             ]);
         }
 
-        // Ordenar primero por distancia (ascendente) y luego por puntuación general (descendente)
-        $sortedMatches = $potentialMatches->sortBy('distancia_km')->sortByDesc('puntuacion_general')->values();
+        // Ordenar los matches: primero por distancia (más cercanos) y luego por puntuación de compatibilidad (más alta)
+        $sortedMatches = $potentialMatches->sortBy(function ($match) {
+            return [$match['distancia_km'], - $match['puntuacion_general']];
+        })->values()->all(); // Reset keys after sorting
 
         return response()->json(['matches' => $sortedMatches]);
     }
 
     /**
-     * Procesa una interacción de perfil (like/dislike).
+     * Registra una interacción (like/dislike) entre usuarios y verifica si hay un match.
      *
-     * @param Request $request
-     * @param int $targetUserId El ID del usuario con el que se interactúa.
-     * @param string $interactionType El tipo de interacción ('like' o 'dislike').
+     * @param int $targetUserId
+     * @param string $type
      * @return \Illuminate\Http\JsonResponse
      */
-    public function processInteraction(Request $request, int $targetUserId, string $interactionType)
+    public function interact($targetUserId, $type)
     {
         $currentUser = Auth::user();
 
         if (!$currentUser) {
-            return response()->json(['message' => 'Usuario no autenticado.'], 401);
-        }
-
-        if (!in_array($interactionType, ['like', 'dislike'])) {
-            return response()->json(['message' => 'Tipo de interacción no válido.'], 400);
+            return response()->json(['error' => 'Usuario no autenticado.'], 401);
         }
 
         // Prevenir auto-interacción
-        if ($currentUser->id === $targetUserId) {
+        if ($currentUser->id == $targetUserId) {
             return response()->json(['message' => 'No puedes interactuar contigo mismo.'], 400);
         }
 
-        // Crear o actualizar la interacción
+        // Registrar la interacción
         InteraccionPerfil::updateOrCreate(
             [
                 'id_emisor' => $currentUser->id,
                 'id_receptor' => $targetUserId,
-                'tipo_interaccion' => $interactionType,
             ],
             [
-                'fecha_interaccion' => now(), // Actualiza la fecha si ya existía
+                'tipo_interaccion' => $type,
+                'fecha_interaccion' => Carbon::now(),
             ]
         );
 
-        Log::info("Usuario {$currentUser->id} {$interactionType} a Usuario {$targetUserId}.");
+        Log::info("Usuario {$currentUser->id} interactuó con {$targetUserId} ({$type}).");
 
+        // Verificar si es un match (si ambos se dieron 'like')
         $isMatch = false;
-        $message = "Interacción registrada.";
+        if ($type === 'like') {
+            $otherUserLikedBack = InteraccionPerfil::where('id_emisor', $targetUserId)
+                                                   ->where('id_receptor', $currentUser->id)
+                                                   ->where('tipo_interaccion', 'like')
+                                                   ->exists();
 
-        if ($interactionType === 'like') {
-            // Verificar si el otro usuario también le dio "like" al usuario actual
-            $mutualLike = InteraccionPerfil::where('id_emisor', $targetUserId)
-                                           ->where('id_receptor', $currentUser->id)
-                                           ->where('tipo_interaccion', 'like')
-                                           ->exists();
-
-            if ($mutualLike) {
-                // Crear el emparejamiento (match)
-                // Asegurarse de que el orden de los IDs sea el menor primero para unicidad
-                $id1 = min($currentUser->id, $targetUserId);
-                $id2 = max($currentUser->id, $targetUserId);
-
-                Emparejamientos::updateOrCreate(
-                    [
-                        'usuario1_id' => $id1,
-                        'usuario2_id' => $id2,
-                    ],
-                    [
-                        'estado' => 'activo',
-                        'fecha_emparejamiento' => now(),
-                    ]
-                );
+            if ($otherUserLikedBack) {
                 $isMatch = true;
-                $message = "¡Es un Match! Ambos se gustaron.";
-                Log::info("¡MATCH! entre U{$currentUser->id} y U{$targetUserId}.");
+                // Crear un registro de emparejamiento si no existe
+                Emparejamientos::firstOrCreate([
+                    'id_usuario1' => min($currentUser->id, $targetUserId),
+                    'id_usuario2' => max($currentUser->id, $targetUserId),
+                ]);
+                Log::info("¡MATCH! entre {$currentUser->id} y {$targetUserId}.");
             }
         }
 
-        return response()->json(['message' => $message, 'is_match' => $isMatch]);
+        return response()->json(['message' => 'Interacción registrada con éxito.', 'is_match' => $isMatch]);
     }
 
     /**
-     * Obtiene y devuelve la lista de usuarios con los que el usuario actual ha hecho match.
+     * Muestra la vista del perfil de un usuario con el que se hizo match.
+     * Esto es solo un placeholder, la lógica real para mostrar el perfil completo iría aquí.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param int $userId
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
-    public function getActiveMatches(Request $request)
+    public function showMatchedProfile($userId)
     {
-        $currentUser = Auth::user();
+        $user = AstrologicalUser::with([
+            'datosAstralesBasicos.signoSolar',
+            'groqAstrologyData.signoLunar',
+            'groqAstrologyData.signoAscendente',
+            'imagenesPerfil'
+        ])->find($userId);
 
-        if (!$currentUser) {
-            return response()->json(['error' => 'Usuario no autenticado.'], 401);
+        if (!$user) {
+            return redirect()->route('dashboard')->with('error', 'Perfil no encontrado.');
         }
 
-        // Obtener todos los emparejamientos activos donde el usuario actual es usuario1_id o usuario2_id
-        $activeMatches = Emparejamientos::where(function ($query) use ($currentUser) {
-                                            $query->where('usuario1_id', $currentUser->id)
-                                                  ->orWhere('usuario2_id', $currentUser->id);
-                                        })
-                                        ->where('estado', 'activo')
-                                        ->get();
-
-        $matchedUsersData = [];
-        foreach ($activeMatches as $match) {
-            $otherUserId = ($match->usuario1_id === $currentUser->id) ? $match->usuario2_id : $match->usuario1_id;
-            $otherUser = AstrologicalUser::find($otherUserId);
-
-            if ($otherUser) {
-                $matchedUsersData[] = [
-                    'id' => $otherUser->id,
-                    'nombre_completo' => $otherUser->nombre_completo,
-                    'foto_perfil_url' => $otherUser->foto_perfil_url,
-                    'last_message' => $this->getLastMessage($currentUser->id, $otherUser->id), // Obtener el último mensaje
-                    'unread_messages' => $this->getUnreadMessageCount($currentUser->id, $otherUser->id), // Contar mensajes no leídos
-                    'fecha_emparejamiento' => $match->fecha_emparejamiento,
-                ];
-            }
-        }
-
-        // Opcional: Ordenar los matches por el último mensaje o fecha de emparejamiento
-        // Por ejemplo, por fecha del último mensaje (más reciente primero) o por fecha de emparejamiento.
-        usort($matchedUsersData, function($a, $b) {
-            $dateA = $a['last_message']['fecha_envio'] ?? $a['fecha_emparejamiento'];
-            $dateB = $b['last_message']['fecha_envio'] ?? $b['fecha_emparejamiento'];
-            return strtotime($dateB) - strtotime($dateA);
-        });
-
-
-        return response()->json(['matches' => $matchedUsersData]);
+        return view('others.matched_profile', compact('user'));
     }
 
     /**
-     * Obtiene los mensajes entre dos usuarios.
-     *
-     * @param Request $request
-     * @param int $targetUserId El ID del otro usuario en la conversación.
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function getMessages(Request $request, int $targetUserId)
-    {
-        $currentUser = Auth::user();
-
-        if (!$currentUser) {
-            return response()->json(['error' => 'Usuario no autenticado.'], 401);
-        }
-
-        // Verificar que exista un match activo entre los dos usuarios
-        $matchExists = Emparejamientos::where('estado', 'activo')
-                                    ->where(function($query) use ($currentUser, $targetUserId) {
-                                        $query->where(function($q) use ($currentUser, $targetUserId) {
-                                            $q->where('usuario1_id', $currentUser->id)
-                                              ->where('usuario2_id', $targetUserId);
-                                        })->orWhere(function($q) use ($currentUser, $targetUserId) {
-                                            $q->where('usuario1_id', $targetUserId)
-                                              ->where('usuario2_id', $currentUser->id);
-                                        });
-                                    })
-                                    ->exists();
-
-        if (!$matchExists) {
-            return response()->json(['error' => 'No hay un match activo con este usuario.'], 403);
-        }
-
-        // Obtener mensajes entre los dos usuarios, ordenados por fecha de envío
-        $messages = Mensaje::where(function ($query) use ($currentUser, $targetUserId) {
-                                $query->where('id_remitente', $currentUser->id)
-                                      ->where('id_receptor', $targetUserId);
-                            })
-                            ->orWhere(function ($query) use ($currentUser, $targetUserId) {
-                                $query->where('id_remitente', $targetUserId)
-                                      ->where('id_receptor', $currentUser->id);
-                            })
-                            ->orderBy('fecha_envio', 'asc')
-                            ->get();
-
-        // Marcar mensajes como leídos si el receptor es el usuario actual
-        Mensaje::where('id_receptor', $currentUser->id)
-               ->where('id_remitente', $targetUserId)
-               ->where('leido', false)
-               ->update(['leido' => true]);
-
-        return response()->json(['messages' => $messages]);
-    }
-
-    /**
-     * Envía un nuevo mensaje.
+     * Envia un mensaje a otro usuario.
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function sendMessage(Request $request)
     {
-        $currentUser = Auth::user();
-
-        if (!$currentUser) {
-            return response()->json(['message' => 'Usuario no autenticado.'], 401);
-        }
-
-        $validatedData = $request->validate([
+        $request->validate([
             'id_receptor' => 'required|exists:astrological_users,id',
-            'contenido' => 'required|string|max:1000',
+            'mensaje' => 'required|string|max:1000',
         ]);
 
-        $idReceptor = $validatedData['id_receptor'];
-        $contenido = $validatedData['contenido'];
+        $senderId = Auth::id();
+        $receiverId = $request->input('id_receptor');
+        $messageContent = $request->input('mensaje');
 
-        // Verificar que exista un match activo entre los dos usuarios antes de permitir el envío del mensaje
-        $matchExists = Emparejamientos::where('estado', 'activo')
-                                    ->where(function($query) use ($currentUser, $idReceptor) {
-                                        $query->where(function($q) use ($currentUser, $idReceptor) {
-                                            $q->where('usuario1_id', $currentUser->id)
-                                              ->where('usuario2_id', $idReceptor);
-                                        })->orWhere(function($q) use ($currentUser, $idReceptor) {
-                                            $q->where('usuario1_id', $idReceptor)
-                                              ->where('usuario2_id', $currentUser->id);
-                                        });
-                                    })
-                                    ->exists();
-
-        if (!$matchExists) {
-            return response()->json(['error' => 'No tienes un match activo con este usuario para enviar mensajes.'], 403);
+        if ($senderId === $receiverId) {
+            return response()->json(['error' => 'No puedes enviarte mensajes a ti mismo.'], 400);
         }
 
         $message = Mensaje::create([
-            'id_remitente' => $currentUser->id,
-            'id_receptor' => $idReceptor,
-            'contenido' => $contenido,
-            'fecha_envio' => now(),
+            'id_remitente' => $senderId,
+            'id_receptor' => $receiverId,
+            'mensaje' => $messageContent,
+            'fecha_envio' => Carbon::now(),
             'leido' => false,
         ]);
 
