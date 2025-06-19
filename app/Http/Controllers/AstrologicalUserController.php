@@ -76,6 +76,31 @@ class AstrologicalUserController extends Controller
         return redirect()->route('login')->with('success', '¡Registro exitoso! Por favor, inicia sesión.'); //
     }
 
+    public function showAstromatch() // O el nombre de tu método para la vista principal
+    {
+        $user = Auth::user(); // Obtiene el usuario autenticado
+
+        if (!$user) {
+            // Manejar caso de usuario no autenticado, quizás redirigir a login
+            return redirect()->route('login');
+        }
+
+        // Obtener el usuario como modelo Eloquent para poder usar load()
+        $user = \App\Models\AstrologicalUser::with([
+            'datosAstralesBasicos.signoSolar',
+            'groqAstrologyData.signoLunar',
+            'groqAstrologyData.signoAscendente'
+        ])->find($user->id);
+
+        // Acceder a los datos del signo lunar
+        $lunarSign = null;
+        if ($user->groqAstrologyData && $user->groqAstrologyData->signoLunar) {
+            $lunarSign = $user->groqAstrologyData->signoLunar;
+        }
+
+        return view('astromatch', compact('user', 'lunarSign'));
+    }
+
     private function calcularSignoSolar($day, $month)
     {
         if (($month == 3 && $day >= 21) || ($month == 4 && $day <= 19)) return 'Aries';

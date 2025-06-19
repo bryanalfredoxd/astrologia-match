@@ -40,7 +40,8 @@
 
             {{-- Sección de Abajo: Signo, Elemento y Modalidad (Horizontal) --}}
             @if(isset($user->datosAstralesBasicos->signoSolar))
-                <div class="flex flex-col sm:flex-row items-center md:items-start justify-center md:justify-start space-y-4 sm:space-y-0 sm:space-x-6 md:space-x-8 mt-6 md:mt-8">
+                {{-- CAMBIADO: Usando Grid para mantener horizontalidad y espaciado consistente --}}
+                <div class="grid grid-cols-3 gap-x-4 sm:gap-x-6 md:gap-x-16 justify-items-center mt-6 md:mt-8">
 
                     {{-- Columna 1: Signo Solar (Imagen y Nombre) --}}
                     <div class="flex flex-col items-center text-center">
@@ -130,64 +131,20 @@
             @endif
         </div>
 
-        {{-- Botón para calcular datos astrales con IA (Derecha del todo, posición absoluta) --}}
-        {{-- CAMBIADO DE <a> A <button> y añadido ID --}}
-        <button id="calculateGroqAstrology" class="absolute top-6 right-6 text-[#FFD700] hover:text-white transition-colors duration-200 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-[#FFD700]">
-            <i class="fas fa-magic text-2xl sm:text-3xl"></i> {{-- Icono de magia o estrella para la IA --}}
-        </button>
+        {{-- Botón para editar perfil --}}
+        <a href="{{ route('profile.edit') }}"
+            class="absolute
+                   top-4 right-4   {{-- Por defecto top-4 right-4 para móviles --}}
+                   sm:top-6 sm:right-6 {{-- Mantiene top-6 right-6 para pantallas sm y más grandes --}}
+                   text-[#FFD700] hover:text-white transition-colors duration-200 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-[#FFD700]">
+            <i class="fas fa-edit text-xl sm:text-2xl"></i> {{-- Icono de edición --}}
+        </a>
     </div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const calculateButton = document.getElementById('calculateGroqAstrology');
-
-        if (calculateButton) {
-            calculateButton.addEventListener('click', function(event) {
-                event.preventDefault(); // Previene el comportamiento por defecto del botón/enlace
-
-                // Recolectar los datos del usuario (desde el objeto Blade $user)
-                const userData = {
-                    nombre_completo: "{{ $user->nombre_completo ?? 'Usuario Desconocido' }}",
-                    fecha_nacimiento: "{{ $user->fecha_nacimiento ?? '' }}",
-                    hora_nacimiento: "{{ $user->hora_nacimiento ?? '' }}",
-                    lugar_nacimiento: "{{ $user->lugar_nacimiento ?? '' }}",
-                    genero: "{{ $user->genero ?? '' }}"
-                };
-
-                // Opcional: Mostrar un indicador de carga
-                calculateButton.innerHTML = '<i class="fas fa-spinner fa-spin text-2xl sm:text-3xl"></i>';
-                calculateButton.disabled = true;
-
-                // Enviar los datos al backend usando Fetch API
-                fetch("{{ route('groq.calculate-astrology') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}' // Token CSRF para seguridad en Laravel
-                    },
-                    body: JSON.stringify(userData)
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Redirigir a la página de resultados con los datos de la IA
-                    // Podrías pasar los datos a la URL como parámetros (cuidado con el tamaño)
-                    // O, más seguro, guardarlos en localStorage y que la nueva página los lea
-                    localStorage.setItem('groqResponse', JSON.stringify(data));
-                    window.location.href = "{{ route('groq.show-response') }}";
-                })
-                .catch(error => {
-                    console.error('Error al enviar datos a Groq API:', error);
-                    alert('Hubo un error al calcular los datos astrales con la IA. Consulta la consola.');
-                    calculateButton.innerHTML = '<i class="fas fa-magic text-2xl sm:text-3xl"></i>';
-                    calculateButton.disabled = false;
-                });
-            });
-        }
+        // La lógica para calculateGroqAstrology ya no es necesaria aquí si el botón es un enlace de edición
+        // El botón ahora solo redirige a la página de edición de perfil.
     });
 </script>

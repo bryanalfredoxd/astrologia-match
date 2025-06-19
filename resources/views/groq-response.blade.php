@@ -143,9 +143,13 @@
                         {{-- Contenedor del mapa --}}
                         <div id="mapid" class="w-full h-80 rounded-lg border border-[#4A0E7B] shadow-md mb-4"></div>
 
-                        <button type="button" id="get-location-btn" class="mt-2 text-[#FFD700] hover:text-white text-xs sm:text-sm flex items-center">
-                            <i class="fas fa-location-arrow mr-1"></i> Usar mi ubicación actual
-                        </button>
+                        {{-- Botón "Usar mi ubicación actual" Centrado --}}
+                        <div class="flex justify-center"> {{-- Nuevo div para centrar --}}
+                            <button type="button" id="get-location-btn"
+                                    class="mt-2 text-[#FFD700] hover:text-white text-sm font-medium transition duration-300 ease-in-out flex items-center justify-center py-2 px-4 rounded-full border border-[#FFD700]/50 hover:border-white">
+                                <i class="fas fa-location-arrow mr-2"></i> Usar mi ubicación actual
+                            </button>
+                        </div>
                     </div>
 
                     <div>
@@ -173,8 +177,11 @@
                                  alt="Foto de perfil actual"
                                  class="w-full h-full object-cover rounded-full border border-[#FFD700]">
                         </div>
-                        <input type="file" id="foto_perfil" name="foto_perfil" accept="image/*"
-                               class="w-full text-[#A7B3EB] file:mr-3 file:py-1 file:px-3 sm:file:py-2 sm:file:px-4 file:rounded-full file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-[#FFD700] file:text-[#0A0E2A] hover:file:bg-white">
+                        {{-- Contenedor para centrar el input de tipo file --}}
+                        <div class="flex justify-center">
+                            <input type="file" id="foto_perfil" name="foto_perfil" accept="image/*"
+                                   class="text-[#A7B3EB] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#FFD700] file:text-[#0A0E2A] hover:file:bg-white transition duration-200 ease-in-out cursor-pointer max-w-full">
+                        </div>
                         @error('foto_perfil')
                         <p class="mt-1 text-red-400 text-xs sm:text-sm flex items-center">
                             <i class="fas fa-exclamation-circle mr-1"></i> {{ $message }}

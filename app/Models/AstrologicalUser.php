@@ -52,6 +52,12 @@ class AstrologicalUser extends Authenticatable
         return $this->hasOne(GroqAstrologyData::class, 'user_id');
     }
 
+    // NUEVA RELACIÓN: 1:N con ImagenesPerfil
+    public function imagenesPerfil()
+    {
+        return $this->hasMany(ImagenesPerfil::class, 'id_usuario')->orderBy('orden');
+    }
+
     /**
      * Calcula el porcentaje de completitud del perfil.
      * @return int
@@ -93,35 +99,33 @@ class AstrologicalUser extends Authenticatable
         }
 
         // Datos Astrales Básicos
-        // Asume que id_signo_solar siempre se llena al registrar.
-        // Si existiera la posibilidad de que DatosAstralesBasicos no se creara,
-        // o que id_signo_solar pudiera ser un "placeholder" con ID 13,
-        // necesitaríamos añadir un check para su existencia/validez.
-        // Dado que se crea en el controlador, la existencia del registro ya indica un progreso.
         if ($this->datosAstralesBasicos) {
             $totalFields++; // Contamos id_signo_solar como un campo completo
-            $completedCount++; // Asumimos que si existe el registro, el signo solar está asignado.
+            $completedCount++;
         } else {
-             // Si datosAstralesBasicos no existe, el signo solar no está completo.
-             $totalFields++; // Aún así lo contamos como un campo esperado.
+             $totalFields++;
         }
-
 
         // Datos de GroqAstrologyData (signo lunar y ascendente)
         if ($this->groqAstrologyData) {
             $totalFields += 2; // Lunar y Ascendente
-            // Si el signo lunar no es el "Nada" (ID 13), se considera completo
             if ($this->groqAstrologyData->signo_lunar_id !== 13 && !is_null($this->groqAstrologyData->signo_lunar_id)) {
                 $completedCount++;
             }
-            // Si el signo ascendente no es el "Nada" (ID 13), se considera completo
             if ($this->groqAstrologyData->signo_ascendente_id !== 13 && !is_null($this->groqAstrologyData->signo_ascendente_id)) {
                 $completedCount++;
             }
         } else {
-            $totalFields += 2; // Si no existe el registro, se consideran campos esperados
+            $totalFields += 2;
         }
 
+        // NUEVO: Imágenes de perfil adicionales
+        // Consideramos que tener al menos una imagen adicional suma un punto, o más si se quiere por cada una.
+        // Aquí vamos a contarlas como un campo de completitud si el usuario tiene al menos una imagen adicional.
+        $totalFields++;
+        if ($this->imagenesPerfil->count() > 0) {
+            $completedCount++;
+        }
 
         if ($totalFields === 0) {
             return 0;

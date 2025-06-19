@@ -28,7 +28,7 @@
             >
                 <div class="py-1">
                     <a 
-                        href="#" 
+                        href="{{ route('profile.edit') }}" 
                         class="block px-4 py-2 text-sm text-[#A7B3EB] hover:bg-[#4A0E7B] hover:text-white"
                     >
                         Mi Perfil

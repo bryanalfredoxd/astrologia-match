@@ -1,14 +1,17 @@
 @extends('layouts.app_sesion')
 
 @section('content')
-<section class="bg-[#0A0E2A] text-white min-h-screen p-4 sm:p-6 relative overflow-hidden pb-20 sm:pb-20">
+<section class="bg-[#0A0E2A] text-white min-h-screen p-4 sm:p-6 relative overflow-hidden">
     @include('partials.header')
 
     <div class="max-w-4xl mx-auto">
         {{-- Pasar el usuario a la parcial profile-card --}}
         @include('partials.profile-card', ['user' => $user]) 
+        {{-- ¡NUEVA TARJETA DE IMÁGENES AQUÍ! --}}
+        @include('partials.profile-images-card', ['user' => $user])
+        @include('partials.lunar-sign-card', ['lunarSign' => $lunarSign])
+        @include('partials.ascendant-sign-card', ['ascendantSign' => $ascendantSign])
 
-        @include('partials.daily-compatibility')
         @include('partials.daily-tip')
     </div>
 
