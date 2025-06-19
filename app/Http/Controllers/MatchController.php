@@ -8,6 +8,7 @@ use App\Models\UserDistance;
 use App\Models\InteraccionPerfil;
 use App\Models\Emparejamientos; // Modelo de emparejamientos
 use App\Models\Mensaje; // Modelo de mensajes
+use App\Models\TagMaestro; // Importar el modelo TagMaestro
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -63,13 +64,60 @@ class MatchController extends Controller
                 'datosAstralesBasicos.signoSolar',
                 'groqAstrologyData.signoLunar',
                 'groqAstrologyData.signoAscendente',
-                'imagenesPerfil' // Cargar las imágenes de perfil adicionales
+                'imagenesPerfil', // Cargar las imágenes de perfil adicionales
+                'usuarioTags.tagMaestro' // Cargar los tags del usuario
             ])->find($otherUserId);
 
             if (!$otherUser) {
                 Log::warning("Usuario con ID {$otherUserId} no encontrado en getPotentialMatches, omitiendo.");
                 continue; // Saltar si el usuario no existe (ej. eliminado)
             }
+
+            // Aplicar filtros adicionales de la solicitud
+            // Edad
+            $minAgeFilter = $request->input('age_min');
+            $maxAgeFilter = $request->input('age_max');
+            if ($minAgeFilter && $otherUser->fecha_nacimiento) {
+                $age = Carbon::parse($otherUser->fecha_nacimiento)->age;
+                if ($age < $minAgeFilter) {
+                    continue;
+                }
+            }
+            if ($maxAgeFilter && $otherUser->fecha_nacimiento) {
+                $age = Carbon::parse($otherUser->fecha_nacimiento)->age;
+                if ($age > $maxAgeFilter) {
+                    continue;
+                }
+            }
+
+            // Género
+            $generoFilter = $request->input('genero');
+            if ($generoFilter && $otherUser->genero !== $generoFilter) {
+                continue;
+            }
+
+            // Orientación Sexual
+            $orientacionSexualFilter = $request->input('orientacion_sexual');
+            if ($orientacionSexualFilter && $otherUser->orientacion_sexual !== $orientacionSexualFilter) {
+                continue;
+            }
+
+            // Tags
+            $tagIdsFilter = $request->input('tag_ids');
+            if (!empty($tagIdsFilter)) {
+                $otherUserTagIds = $otherUser->usuarioTags->pluck('id_tag')->toArray();
+                $hasAllRequiredTags = true;
+                foreach ($tagIdsFilter as $tagId) {
+                    if (!in_array((int)$tagId, $otherUserTagIds)) {
+                        $hasAllRequiredTags = false;
+                        break;
+                    }
+                }
+                if (!$hasAllRequiredTags) {
+                    continue;
+                }
+            }
+
 
             // Obtener la distancia geográfica
             $distanceRecord = UserDistance::where(function ($query) use ($currentUser, $otherUser) {
@@ -296,5 +344,29 @@ class MatchController extends Controller
                       ->where('id_remitente', $senderId)
                       ->where('leido', false)
                       ->count();
+    }
+
+    /**
+     * Obtiene las opciones disponibles para los filtros de búsqueda.
+     * Incluye géneros, orientaciones sexuales y tags categorizados.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getFilterOptions()
+    {
+        // Obtener géneros y orientaciones sexuales directamente del modelo o definirlos
+        // Si estos valores son fijos, es mejor definirlos como constantes o en un archivo de configuración.
+        // Asumiendo que están en el código de validación de AstrologicalUser:
+        $generos = ['Masculino', 'Femenino'];
+        $orientacionesSexuales = ['Heterosexual', 'Homosexual', 'Bisexual', 'Pansexual', 'Asexual'];
+
+        // Obtener todos los tags maestros y agruparlos por categoría
+        $tags = TagMaestro::orderBy('categoria')->orderBy('nombre_tag')->get()->groupBy('categoria');
+
+        return response()->json([
+            'generos' => $generos,
+            'orientaciones_sexuales' => $orientacionesSexuales,
+            'tags' => $tags,
+        ]);
     }
 }

@@ -11,7 +11,7 @@ use App\Jobs\CalculateCompatibilityMatches;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\ProfileImageController; // Importar el controlador de imágenes
- use App\Models\TagMaestro;
+use App\Models\TagMaestro;
 
 // Página principal con splash screen
 Route::get('/', function () {
@@ -86,8 +86,11 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    // Ruta para obtener los matches potenciales
+    // Ruta para obtener los matches potenciales con filtros
     Route::get('/api/matches', [MatchController::class, 'getPotentialMatches'])->name('matches.get');
+
+    // Nueva ruta para obtener las opciones de filtro (géneros, orientaciones, tags)
+    Route::get('/api/matches/filter-options', [MatchController::class, 'getFilterOptions'])->name('matches.filter-options');
 
     // Rutas para procesar las interacciones (like/dislike)
     Route::post('/api/matches/{targetUserId}/interact/{interactionType}', [MatchController::class, 'processInteraction'])->name('matches.interact');

@@ -31,6 +31,72 @@
         </div>
     </div>
 
+    {{-- Floating Filter Button --}}
+    <button id="filterBtn" class="fixed top-4 right-4 z-40 bg-[#FFD700] text-[#0A0E2A] w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-2xl hover:bg-[#F8C800] transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-[#FFD700] focus:ring-opacity-75 animate-bounce-slow" aria-label="Abrir filtros de búsqueda">
+        <i class="fas fa-filter"></i>
+    </button>
+
+    {{-- Filter Modal (Off-canvas) --}}
+<div id="filterModal" class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden flex justify-end overflow-y-auto" aria-hidden="true">
+    <div class="bg-gradient-to-br from-[#1A1F4D] to-[#4A0E7B] w-full max-w-sm min-h-screen overflow-y-auto transform translate-x-full transition-transform duration-300 ease-in-out p-6 shadow-2xl relative" role="dialog" aria-labelledby="filterModalTitle">
+        <button id="closeFilterModalBtn" class="absolute top-4 left-4 text-white hover:text-[#FFD700] text-3xl z-10" aria-label="Cerrar filtros">
+            <i class="fas fa-times-circle"></i>
+        </button>
+        <h2 id="filterModalTitle" class="text-3xl font-extrabold text-[#FFD700] mb-8 text-center pt-4">Filtros de Búsqueda</h2>
+
+        <form id="filterForm" class="space-y-6 pb-24"> <!-- Añadido pb-24 para espacio en móviles -->
+            {{-- Edad --}}
+            <div>
+                <label for="age_min" class="block text-lg font-semibold text-white mb-2">Edad:</label>
+                <div class="flex items-center space-x-4">
+                    <input type="number" id="age_min" name="age_min" min="18" max="100" placeholder="Min" class="w-1/2 p-3 rounded-xl bg-gray-800 text-white border border-[#FFD700]/30 focus:border-[#FFD700] focus:ring focus:ring-[#FFD700]/50 outline-none">
+                    <span class="text-white">-</span>
+                    <input type="number" id="age_max" name="age_max" min="18" max="100" placeholder="Max" class="w-1/2 p-3 rounded-xl bg-gray-800 text-white border border-[#FFD700]/30 focus:border-[#FFD700] focus:ring focus:ring-[#FFD700]/50 outline-none">
+                </div>
+            </div>
+
+            {{-- Género --}}
+            <div>
+                <label for="genero_filter" class="block text-lg font-semibold text-white mb-2">Género:</label>
+                <select id="genero_filter" name="genero" class="w-full p-3 rounded-xl bg-gray-800 text-white border border-[#FFD700]/30 focus:border-[#FFD700] focus:ring focus:ring-[#FFD700]/50 outline-none">
+                    <option value="">Todos</option>
+                    {{-- Opciones cargadas dinámicamente --}}
+                </select>
+            </div>
+
+            {{-- Orientación Sexual --}}
+            <div>
+                <label for="orientacion_sexual_filter" class="block text-lg font-semibold text-white mb-2">Orientación Sexual:</label>
+                <select id="orientacion_sexual_filter" name="orientacion_sexual" class="w-full p-3 rounded-xl bg-gray-800 text-white border border-[#FFD700]/30 focus:border-[#FFD700] focus:ring focus:ring-[#FFD700]/50 outline-none">
+                    <option value="">Todas</option>
+                    {{-- Opciones cargadas dinámicamente --}}
+                </select>
+            </div>
+
+            {{-- Tags --}}
+            <div>
+                <label class="block text-lg font-semibold text-white mb-2">Tags de Interés:</label>
+                <div id="tagsContainer" class="space-y-4 bg-gray-800 p-4 rounded-xl border border-[#FFD700]/30 max-h-60 overflow-y-auto custom-scrollbar">
+                    {{-- Tags cargados dinámicamente --}}
+                    <p class="text-white/70">Cargando tags...</p>
+                </div>
+            </div>
+
+            <div class="flex justify-between mt-8 pt-4 border-t border-white/10">
+                <button type="button" id="resetFiltersBtn" class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-full transition duration-300 transform hover:scale-105 shadow-lg">
+                    Limpiar Filtros
+                </button>
+                <button type="submit" class="px-6 py-3 bg-[#FFD700] hover:bg-[#F8C800] text-[#0A0E2A] font-extrabold rounded-full transition duration-300 transform hover:scale-105 shadow-lg">
+                    Aplicar Filtros
+                </button>
+            </div>
+        </form>
+        
+        <!-- Espacio adicional solo para móviles -->
+        <div class="block sm:hidden h-5"></div>
+    </div>
+</div>
+
     {{-- Match Modal --}}
     <div id="matchModal" class="fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center z-50 p-4 hidden animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="matchModalTitle">
         <div class="bg-gradient-to-br from-[#4A0E7B] to-[#1A1F4D] p-8 sm:p-10 rounded-3xl shadow-2xl border border-[#FFD700]/50 text-center relative max-w-sm sm:max-w-md mx-auto transform scale-95 opacity-0 animate-scale-in">
@@ -136,7 +202,7 @@
         transform: rotate(180deg);
     }
 
-    /* Custom Scrollbar for detailed analysis */
+    /* Custom Scrollbar */
     .custom-scrollbar::-webkit-scrollbar {
         width: 8px;
     }
@@ -174,6 +240,20 @@
         animation: scale-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     }
 
+    /* Floating button animation */
+    @keyframes bounce-slow {
+        0%, 100% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-5px) scale(1.05); }
+    }
+
+    .animate-bounce-slow {
+        animation: bounce-slow 2s infinite ease-in-out;
+    }
+
+    /* Filter Modal Specific Animations */
+    .filter-modal-open {
+        transform: translateX(0) !important;
+    }
 </style>
 
 <script>
@@ -189,27 +269,113 @@
         const viewProfileBtn = document.getElementById('viewProfileBtn');
         const closeMatchModalX = document.getElementById('closeMatchModalX');
 
-        // New elements for image lightbox
+        // Elements for image lightbox
         const imageLightbox = document.getElementById('imageLightbox');
         const lightboxImage = document.getElementById('lightboxImage');
         const closeLightboxBtn = document.getElementById('closeLightboxBtn');
+
+        // Elements for filter modal
+        const filterBtn = document.getElementById('filterBtn');
+        const filterModal = document.getElementById('filterModal');
+        const filterModalContent = filterModal.querySelector('div'); // The inner div that slides in
+        const closeFilterModalBtn = document.getElementById('closeFilterModalBtn');
+        const filterForm = document.getElementById('filterForm');
+        const generoFilterSelect = document.getElementById('genero_filter');
+        const orientacionSexualFilterSelect = document.getElementById('orientacion_sexual_filter');
+        const tagsContainer = document.getElementById('tagsContainer');
+        const ageMinInput = document.getElementById('age_min');
+        const ageMaxInput = document.getElementById('age_max');
+        const resetFiltersBtn = document.getElementById('resetFiltersBtn');
 
 
         let matches = [];
         let currentMatchIndex = 0;
         let csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        let currentFilters = {}; // To store the applied filters
 
         /**
-         * Fetches potential matches from the API.
+         * Fetches filter options (genres, orientations, tags) from the API and populates the filter modal.
          */
-        async function fetchMatches() {
+        async function fetchFilterOptions() {
+            try {
+                const response = await fetch('{{ route('matches.filter-options') }}');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                // Populate Genero select
+                generoFilterSelect.innerHTML = '<option value="">Todos</option>';
+                data.generos.forEach(genero => {
+                    const option = document.createElement('option');
+                    option.value = genero;
+                    option.textContent = genero;
+                    generoFilterSelect.appendChild(option);
+                });
+
+                // Populate Orientacion Sexual select
+                orientacionSexualFilterSelect.innerHTML = '<option value="">Todas</option>';
+                data.orientaciones_sexuales.forEach(orientacion => {
+                    const option = document.createElement('option');
+                    option.value = orientacion;
+                    option.textContent = orientacion;
+                    orientacionSexualFilterSelect.appendChild(option);
+                });
+
+                // Populate Tags
+                tagsContainer.innerHTML = ''; // Clear loading message
+                if (Object.keys(data.tags).length > 0) {
+                    for (const category in data.tags) {
+                        const categoryDiv = document.createElement('div');
+                        categoryDiv.className = 'mb-3';
+                        categoryDiv.innerHTML = `<h4 class="font-bold text-[#FFD700] mb-2">${category}:</h4>`;
+                        const tagsListDiv = document.createElement('div');
+                        tagsListDiv.className = 'flex flex-wrap gap-2';
+
+                        data.tags[category].forEach(tag => {
+                            const tagId = `tag-${tag.id_tag}`;
+                            const checkboxHtml = `
+                                <input type="checkbox" id="${tagId}" name="tag_ids[]" value="${tag.id_tag}" class="hidden peer">
+                                <label for="${tagId}" class="inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium border border-gray-600 text-gray-300 bg-gray-700 cursor-pointer transition-all duration-200 ease-in-out
+                                    peer-checked:bg-[#FFD700] peer-checked:text-[#0A0E2A] peer-checked:border-[#FFD700] peer-checked:shadow-md
+                                    hover:bg-gray-600 hover:text-white">
+                                    ${tag.nombre_tag}
+                                </label>
+                            `;
+                            tagsListDiv.innerHTML += checkboxHtml;
+                        });
+                        categoryDiv.appendChild(tagsListDiv);
+                        tagsContainer.appendChild(categoryDiv);
+                    }
+                } else {
+                    tagsContainer.innerHTML = '<p class="text-white/70">No hay tags disponibles.</p>';
+                }
+
+                // Restore selected filters if any
+                applyCurrentFiltersToForm();
+
+            } catch (error) {
+                console.error('Error fetching filter options:', error);
+                tagsContainer.innerHTML = '<p class="text-red-400">Error al cargar filtros. Intenta de nuevo más tarde.</p>';
+            }
+        }
+
+        /**
+         * Fetches potential matches from the API with current filters.
+         * @param {Object} filters - Optional filter parameters.
+         */
+        async function fetchMatches(filters = {}) {
             loadingMessage.classList.remove('hidden');
             noMatchesMessage.classList.add('hidden');
             matchCardContainer.innerHTML = ''; // Clear container
 
+            // Construct query parameters
+            const params = new URLSearchParams(filters);
+            const queryString = params.toString();
+            const url = `{{ route('matches.get') }}${queryString ? `?${queryString}` : ''}`;
+
             try {
-                // Ensure 'imagenesPerfil' is eager loaded in the backend (MatchController.php)
-                const response = await fetch('{{ route('matches.get') }}');
+                const response = await fetch(url);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -221,6 +387,7 @@
                 console.error('Error fetching matches:', error);
                 loadingMessage.textContent = 'Error al cargar matches. Por favor, intenta de nuevo más tarde.';
                 loadingMessage.classList.remove('hidden');
+                matchCardContainer.innerHTML = '';
                 likeBtn.disabled = true;
                 dislikeBtn.disabled = true;
             } finally {
@@ -365,7 +532,7 @@
             const modalityDetails = getModalidadDetails(signData.modalidad);
 
             return `
-                <div class="bg-gradient-to-r from-[#4A0E7B] to-[#1A1F4D] backdrop-blur-sm rounded-2xl p-4 sm:p-6 mb-4 shadow-lg">
+                <div class=" backdrop-blur-sm rounded-2xl p-4 sm:p-6 mb-4 shadow-lg">
                     <div class="flex items-center justify-center mb-4">
                         <h2 class="text-xl sm:text-2xl font-bold flex items-center text-center">
                             <i class="fas ${signTypeIcon} text-[#FFD700] mr-3"></i>
@@ -432,7 +599,7 @@
             // Generate HTML for each astrological sign section
             const solarSignSection = formatAstrologicalSignSection(match.signos.solar, 'fa-sun', 'Signo Solar');
             const lunarSignSection = formatAstrologicalSignSection(match.signos.lunar, 'fa-moon', 'Signo Lunar');
-            const ascendantSignSection = formatAstrologicalSignSection(match.signos.ascendente, 'fa-caret-up', 'Signo Ascendente');
+            const ascendantSignSection = formatAstrologicalSignSection(match.signos.ascendente, 'fa-arrow-up', 'Signo Ascendente');
 
             // Generate HTML for additional profile images
             let additionalImagesHtml = '';
@@ -472,10 +639,7 @@
                         </p>
                         <p class="text-sm sm:text-base text-[#E0E7FF] text-center italic mb-3">${match.descripcion_breve}</p>
 
-                        {{-- Astrological Signs Sections (outside collapsible) --}}
-                        ${solarSignSection}
-                        ${lunarSignSection}
-                        ${ascendantSignSection}
+                        
 
                         {{-- Collapsible Detailed Analysis --}}
                         <div class="w-full flex justify-center mb-2">
@@ -488,6 +652,11 @@
                             <p>${match.analisis_detallado}</p>
                         </div>
                     </div>
+
+                    {{-- Astrological Signs Sections (outside collapsible) --}}
+                        ${solarSignSection}
+                        ${lunarSignSection}
+                        ${ascendantSignSection}
 
                     <p class="text-sm sm:text-base text-[#E0E7FF] text-center mt-auto italic">"${match.biografia || 'Sin biografía disponible.'}"</p>
 
@@ -614,9 +783,100 @@
             }
         });
 
+        // Filter Modal Functions
+        filterBtn.addEventListener('click', () => {
+            filterModal.classList.remove('hidden');
+            setTimeout(() => {
+                filterModalContent.classList.add('filter-modal-open');
+            }, 10); // Small delay to allow 'hidden' to be removed first
+        });
 
-        // Load matches on page load
-        fetchMatches();
+        closeFilterModalBtn.addEventListener('click', () => {
+            filterModalContent.classList.remove('filter-modal-open');
+            filterModalContent.addEventListener('transitionend', () => {
+                filterModal.classList.add('hidden');
+            }, { once: true });
+        });
+
+        filterModal.addEventListener('click', (event) => {
+            // Close if clicking outside the content area
+            if (event.target === filterModal) {
+                filterModalContent.classList.remove('filter-modal-open');
+                filterModalContent.addEventListener('transitionend', () => {
+                    filterModal.classList.add('hidden');
+                }, { once: true });
+            }
+        });
+
+        filterForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            const filters = {};
+            const formData = new FormData(filterForm);
+
+            // Get age filters
+            const ageMin = formData.get('age_min');
+            const ageMax = formData.get('age_max');
+            if (ageMin) filters.age_min = ageMin;
+            if (ageMax) filters.age_max = ageMax;
+
+            // Get gender filter
+            const genero = formData.get('genero');
+            if (genero) filters.genero = genero;
+
+            // Get sexual orientation filter
+            const orientacionSexual = formData.get('orientacion_sexual');
+            if (orientacionSexual) filters.orientacion_sexual = orientacionSexual;
+
+            // Get selected tags
+            const selectedTags = [];
+            filterForm.querySelectorAll('input[name="tag_ids[]"]:checked').forEach(checkbox => {
+                selectedTags.push(checkbox.value);
+            });
+            if (selectedTags.length > 0) {
+                filters.tag_ids = selectedTags;
+            }
+
+            currentFilters = filters; // Store current filters
+            fetchMatches(currentFilters); // Fetch matches with new filters
+            closeFilterModalBtn.click(); // Close the modal
+        });
+
+        resetFiltersBtn.addEventListener('click', () => {
+            filterForm.reset(); // Reset form fields
+            currentFilters = {}; // Clear stored filters
+            fetchMatches(currentFilters); // Fetch matches without filters
+            closeFilterModalBtn.click(); // Close the modal
+        });
+
+        /**
+         * Applies the currently stored filters to the form elements when the modal opens.
+         */
+        function applyCurrentFiltersToForm() {
+            if (currentFilters.age_min) ageMinInput.value = currentFilters.age_min; else ageMinInput.value = '';
+            if (currentFilters.age_max) ageMaxInput.value = currentFilters.age_max; else ageMaxInput.value = '';
+            if (currentFilters.genero) generoFilterSelect.value = currentFilters.genero; else generoFilterSelect.value = '';
+            if (currentFilters.orientacion_sexual) orientacionSexualFilterSelect.value = currentFilters.orientacion_sexual; else orientacionSexualFilterSelect.value = '';
+
+            // Reset all tag checkboxes first
+            filterForm.querySelectorAll('input[name="tag_ids[]"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            // Check the ones that are in currentFilters.tag_ids
+            if (currentFilters.tag_ids && Array.isArray(currentFilters.tag_ids)) {
+                currentFilters.tag_ids.forEach(tagId => {
+                    const checkbox = document.getElementById(`tag-${tagId}`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                });
+            }
+        }
+
+
+        // Initial load
+        fetchMatches(); // Initial fetch without filters
+        fetchFilterOptions(); // Populate filter modal options
     });
 </script>
 @endsection
