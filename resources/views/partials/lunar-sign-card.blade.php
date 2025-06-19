@@ -101,7 +101,7 @@
         </div>
     @else
         <p class="text-[#A7B3EB] text-center mt-6">
-            Tu Signo Lunar aún no ha sido calculado. Completa tu perfil y usa la función de IA para obtenerlo.
+            Tu Signo Lunar aún no ha sido calculado. Completa tu perfil para obtenerlo.
         </p>
     @endif
 </div>

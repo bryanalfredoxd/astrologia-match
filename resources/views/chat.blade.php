@@ -12,23 +12,27 @@
             </div>
         </div>
 
-        <div id="chatArea" class="flex-col w-full md:flex-1 h-full hidden md:flex">
+        <div id="chatArea" class="flex-col w-full md:flex-1 hidden md:flex relative">
 
             <div id="chatHeader" class="bg-white bg-opacity-10 backdrop-blur-md shadow-md p-4 flex items-center justify-start border-b border-white/10">
                 <p id="chatHeaderPlaceholder" class="text-sm text-[#A7B3EB] italic w-full text-center">Selecciona un contacto</p>
             </div>
 
+            {{-- Se elimina la altura fija h-[calc(100vh-260px)] min-h-[300px)] y se maneja por flexbox --}}
             <div id="chatMessages" class="flex-1 overflow-y-auto px-4 py-6 space-y-4 custom-scrollbar">
-                <p id="selectMatchMessage" class="text-[#A7B3EB] italic text-center text-lg">Selecciona un match para comenzar a chatear</p>
+                <p id="selectMatchMessage" class="text-[#A7B3EB] italic text-center text-lg mt-10">Selecciona un match para comenzar a chatear</p>
             </div>
 
-            <form id="messageForm" class="bg-white bg-opacity-10 backdrop-blur-md px-4 py-3 flex items-center space-x-3 border-t border-white/10">
-                {{-- ELIMINADO: <button type="button" id="emojiToggleBtn" class="text-white text-2xl hover:text-yellow-300 transition-colors"><i class="fa-regular fa-face-smile"></i></button> --}}
-                <input id="messageInput" type="text" placeholder="Escribe un mensaje..." class="flex-1 px-4 py-2 rounded-full text-gray-900 focus:outline-none bg-white bg-opacity-80" disabled>
-                <button type="submit" id="sendMessageBtn" class="bg-purple-600 text-white rounded-full px-5 py-2 hover:bg-purple-700 transition" disabled><i class="fa-solid fa-paper-plane"></i></button>
-            </form>
-
-            {{-- ELIMINADO: <div id="emojiPanel" class="hidden fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-white text-gray-900 p-2 rounded-lg shadow-xl text-xl z-50 border border-gray-300 grid grid-cols-6 gap-2 sm:grid-cols-8 md:grid-cols-10 max-w-xs sm:max-w-md"></div> --}}
+            <div class="sticky bottom-0 w-full bg-[#0A0E2A]">
+                <form id="messageForm" class="bg-white bg-opacity-10 backdrop-blur-md px-4 py-3 flex items-center space-x-3 border-t border-white/10">
+                    <input id="messageInput" type="text" placeholder="Escribe un mensaje..."
+                           class="flex-1 px-4 py-2 rounded-full text-gray-900 focus:outline-none bg-white bg-opacity-80" disabled>
+                    <button type="submit" id="sendMessageBtn"
+                            class="bg-purple-600 text-white rounded-full px-5 py-2 hover:bg-purple-700 transition" disabled>
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -79,8 +83,6 @@
             chatMessages: document.getElementById('chatMessages'),
             messageInput: document.getElementById('messageInput'),
             sendMessageBtn: document.getElementById('sendMessageBtn'),
-            // ELIMINADO: emojiToggleBtn: document.getElementById('emojiToggleBtn'),
-            // ELIMINADO: emojiPanel: document.getElementById('emojiPanel'),
             selectMatchMessage: document.getElementById('selectMatchMessage'),
             messageForm: document.getElementById('messageForm'),
         };
@@ -88,8 +90,6 @@
         let currentChatTargetId = null;
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         const currentUserId = {{ Auth::id() }};
-
-        // ELIMINADO: const emojis = ['😀', '😁', ...];
 
         const getUserAvatar = (user) => user.foto_perfil_url
             ? `{{ asset('') }}${user.foto_perfil_url}`
@@ -217,9 +217,12 @@
 
                 if (!appendOnly) {
                     renderMessages(data.messages);
+                    // Scroll al final al cargar un chat nuevo o recargar
+                    els.chatMessages.scrollTop = els.chatMessages.scrollHeight;
                 } else if (newMessages.length > 0) {
+                    const isScrolledToBottom = els.chatMessages.scrollHeight - els.chatMessages.scrollTop <= els.chatMessages.clientHeight + 50;
                     newMessages.forEach(msg => renderSingleMessage(msg, msg.id_remitente === currentUserId));
-                    if (els.chatMessages.scrollHeight - els.chatMessages.scrollTop <= els.chatMessages.clientHeight + 50) {
+                    if (isScrolledToBottom) {
                         els.chatMessages.scrollTop = els.chatMessages.scrollHeight;
                     }
                 }
@@ -244,6 +247,7 @@
             }
 
             messages.forEach(msg => renderSingleMessage(msg, msg.id_remitente === currentUserId));
+            // Asegura que al renderizar mensajes por primera vez, el scroll esté al final
             els.chatMessages.scrollTop = els.chatMessages.scrollHeight;
         };
 
@@ -264,7 +268,7 @@
             msgElement.className = `flex ${messageClass} items-end space-x-2`;
             msgElement.innerHTML = `
                 ${!isMe ? `<img src="${photoUrl}" class="rounded-full w-8 h-8 object-cover" alt="Avatar">` : ''}
-                <div class="${bubbleClass} rounded-2xl p-3 max-w-xs md:max-w-md ${textColorClass}">
+                <div class="${bubbleClass} rounded-2xl p-3 max-w-[75%] sm:max-w-md ${textColorClass} break-words">
                     <p>${msg.contenido}</p>
                     <span class="text-xs ${isMe ? 'text-purple-200' : 'text-[#A7B3EB]'} block mt-1 text-right">${formatTime(msg.fecha_envio)}</span>
                 </div>
@@ -341,7 +345,6 @@
             els.chatHeader.innerHTML = `<p id="chatHeaderPlaceholder" class="text-sm text-[#A7B3EB] italic w-full text-center">Selecciona un contacto</p>`;
             els.messageInput.setAttribute('disabled', 'disabled');
             els.sendMessageBtn.setAttribute('disabled', 'disabled');
-            // ELIMINADO: els.emojiPanel.classList.add('hidden');
             stopPolling();
 
             if (window.innerWidth < 768) {
@@ -376,6 +379,7 @@
                 const data = await response.json();
                 renderSingleMessage(data.data, true);
                 els.messageInput.value = '';
+                // Asegura que el scroll esté al final después de enviar un mensaje
                 els.chatMessages.scrollTop = els.chatMessages.scrollHeight;
                 lastMessageTimestamp[currentChatTargetId] = new Date(data.data.fecha_envio).getTime();
 
@@ -394,11 +398,6 @@
                 els.sendMessageBtn.disabled = false;
             }
         });
-
-        // ELIMINADO: const initEmojiPanel = () => { ... };
-        // ELIMINADO: els.emojiToggleBtn.addEventListener('click', () => { ... });
-        // ELIMINADO: document.addEventListener('click', (event) => { ... });
-
 
         const handleResize = () => {
             if (window.innerWidth < 768) {
@@ -458,7 +457,6 @@
 
         // --- Inicialización ---
         fetchActiveMatches();
-        // ELIMINADO: initEmojiPanel();
         handleResize();
         window.addEventListener('resize', handleResize);
         startUnreadCountPolling();

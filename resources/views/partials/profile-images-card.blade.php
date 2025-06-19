@@ -1,5 +1,5 @@
 <!-- Sección de Imágenes Adicionales del Perfil -->
-<div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 mb-6 shadow-lg">
+<div class="bg-gradient-to-r from-[#4A0E7B] to-[#1A1F4D] backdrop-blur-sm rounded-2xl p-4 sm:p-6 mb-6 shadow-lg">
     <div class="flex items-center justify-center mb-4">
         <h2 class="text-xl sm:text-2xl font-bold flex items-center text-center">
             <i class="fas fa-images text-[#FFD700] mr-3"></i>
