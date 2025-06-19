@@ -58,6 +58,12 @@ class AstrologicalUser extends Authenticatable
         return $this->hasMany(ImagenesPerfil::class, 'id_usuario')->orderBy('orden');
     }
 
+    // NUEVA RELACIÓN: 1:N con UsuarioTag
+    public function usuarioTags()
+    {
+        return $this->hasMany(UsuarioTag::class, 'id_usuario');
+    }
+
     /**
      * Calcula el porcentaje de completitud del perfil.
      * @return int
@@ -124,6 +130,12 @@ class AstrologicalUser extends Authenticatable
         // Aquí vamos a contarlas como un campo de completitud si el usuario tiene al menos una imagen adicional.
         $totalFields++;
         if ($this->imagenesPerfil->count() > 0) {
+            $completedCount++;
+        }
+
+        // NUEVO: Tags de perfil adicionales
+        $totalFields++; // Consideramos los tags como un campo de completitud
+        if ($this->usuarioTags->count() > 0) {
             $completedCount++;
         }
 

@@ -9,6 +9,8 @@
         @include('partials.profile-card', ['user' => $user]) 
         {{-- ¡NUEVA TARJETA DE IMÁGENES AQUÍ! --}}
         @include('partials.profile-images-card', ['user' => $user])
+        {{-- ¡NUEVA TARJETA DE TAGS AQUÍ! --}}
+        @include('partials.profile-tags-card', ['user' => $user, 'masterTags' => $masterTags, 'userTagIds' => $userTagIds])
         @include('partials.lunar-sign-card', ['lunarSign' => $lunarSign])
         @include('partials.ascendant-sign-card', ['ascendantSign' => $ascendantSign])
 

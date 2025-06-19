@@ -5,13 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\AstrologicalUser;
 use App\Models\SignoZodiacal;
 use App\Models\DatosAstralesBasicos;
-use App\Models\GroqAstrologyData; // Importa el modelo GroqAstrologyData
+use App\Models\GroqAstrologyData;
+use App\Models\TagMaestro; // Import the TagMaestro model
+use App\Models\UsuarioTag; // Import the UsuarioTag model
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB; // For database transactions
 
 class AstrologicalUserController extends Controller
 {
@@ -76,30 +79,55 @@ class AstrologicalUserController extends Controller
         return redirect()->route('login')->with('success', '¡Registro exitoso! Por favor, inicia sesión.'); //
     }
 
-    public function showAstromatch() // O el nombre de tu método para la vista principal
+    public function showAstromatch()
     {
-        $user = Auth::user(); // Obtiene el usuario autenticado
+        $user = Auth::user();
 
         if (!$user) {
-            // Manejar caso de usuario no autenticado, quizás redirigir a login
             return redirect()->route('login');
         }
 
-        // Obtener el usuario como modelo Eloquent para poder usar load()
-        $user = \App\Models\AstrologicalUser::with([
+        $user = AstrologicalUser::with([
             'datosAstralesBasicos.signoSolar',
             'groqAstrologyData.signoLunar',
-            'groqAstrologyData.signoAscendente'
+            'groqAstrologyData.signoAscendente',
+            'imagenesPerfil',
+            'usuarioTags.tagMaestro'
         ])->find($user->id);
 
-        // Acceder a los datos del signo lunar
         $lunarSign = null;
         if ($user->groqAstrologyData && $user->groqAstrologyData->signoLunar) {
             $lunarSign = $user->groqAstrologyData->signoLunar;
         }
 
-        return view('astromatch', compact('user', 'lunarSign'));
+        $ascendantSign = null;
+        if ($user->groqAstrologyData && $user->groqAstrologyData->signoAscendente) {
+            $ascendantSign = $user->groqAstrologyData->signoAscendente;
+        }
+
+        $masterTags = TagMaestro::orderBy('categoria')->orderBy('nombre_tag')->get()->groupBy('categoria');
+        $userTagIds = $user->usuarioTags->pluck('id_tag')->toArray();
+
+        // **NUEVO: Definir categorías de selección única**
+        $singleSelectionCategories = [
+            'Estado Civil/Sentimental',
+            'Estudio',
+            'Trabajo',
+            'Tipo de Relación',
+            'Buscando',
+            'Ejercicio',
+            'Bebe',
+            'Fuma',
+            'Religión',
+            'Niños',
+            'Nivel Educativo',
+            // Añade aquí cualquier otra categoría que deba ser de selección única
+        ];
+
+
+        return view('astromatch', compact('user', 'lunarSign', 'ascendantSign', 'masterTags', 'userTagIds', 'singleSelectionCategories'));
     }
+
 
     private function calcularSignoSolar($day, $month)
     {
@@ -360,5 +388,57 @@ class AstrologicalUserController extends Controller
 
         // Pasar el total a la vista
         return view('others.usuario_compatibles', compact('totalCompatibles'));
+    }
+
+    /**
+     * Guarda los tags seleccionados por el usuario.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateUserTags(Request $request)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Usuario no autenticado.'], 401);
+        }
+
+        $validated = $request->validate([
+            'tag_ids' => 'array',
+            'tag_ids.*' => 'exists:tags_maestros,id_tag', // Ensure each tag ID exists
+        ]);
+
+        $selectedTagIds = collect($validated['tag_ids'])->unique()->values()->all();
+
+        DB::beginTransaction();
+        try {
+            // Eliminar todos los tags actuales del usuario
+            UsuarioTag::where('id_usuario', $user->id)->delete();
+
+            // Insertar los nuevos tags seleccionados
+            $tagsToInsert = [];
+            foreach ($selectedTagIds as $tagId) {
+                $tagsToInsert[] = [
+                    'id_usuario' => $user->id,
+                    'id_tag' => $tagId,
+                    'fecha_asignacion' => now(),
+                    'created_at' => now(), // Add timestamps for the UsuarioTag model
+                    'updated_at' => now(),
+                ];
+            }
+
+            if (!empty($tagsToInsert)) {
+                UsuarioTag::insert($tagsToInsert);
+            }
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Tags actualizados correctamente.']);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Error al actualizar tags del usuario {$user->id}: " . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Error al guardar los tags.', 'error' => $e->getMessage()], 500);
+        }
     }
 }

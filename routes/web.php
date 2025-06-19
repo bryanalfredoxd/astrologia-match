@@ -10,7 +10,8 @@ use App\Jobs\CalculateUserDistances;
 use App\Jobs\CalculateCompatibilityMatches;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\MatchController;
-use App\Http\Controllers\ProfileImageController; // NUEVO: Importar el controlador de imágenes
+use App\Http\Controllers\ProfileImageController; // Importar el controlador de imágenes
+ use App\Models\TagMaestro;
 
 // Página principal con splash screen
 Route::get('/', function () {
@@ -29,42 +30,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Ruta protegida (requiere autenticación)
-Route::get('/astromatch', function () {
-    // Obtener el usuario autenticado
-    $user = Auth::user();
-
-    // Inicializar variables a null para evitar errores si no se encuentran los datos
-    $lunarSign = null;
-    $ascendantSign = null;
-
-    // Verificar si el usuario está autenticado y es una instancia de AstrologicalUser
-    if ($user instanceof AstrologicalUser) {
-        // Cargar las relaciones necesarias para el perfil
-        // Añadimos 'imagenesPerfil' para la nueva tarjeta
-        $user->load('datosAstralesBasicos.signoSolar', 'groqAstrologyData.signoLunar', 'groqAstrologyData.signoAscendente', 'imagenesPerfil');
-
-        // Acceder a los datos del signo lunar si existen
-        if ($user->groqAstrologyData && $user->groqAstrologyData->signoLunar) {
-            $lunarSign = $user->groqAstrologyData->signoLunar;
-        }
-
-        // Acceder a los datos del signo ascendente si existen
-        if ($user->groqAstrologyData && $user->groqAstrologyData->signoAscendente) {
-            $ascendantSign = $user->groqAstrologyData->signoAscendente;
-        }
-
-        // Despachar los jobs para calcular distancias y compatibilidad en segundo plano
-        if (!is_null($user->latitud) && !is_null($user->longitud)) {
-            \App\Jobs\CalculateUserDistances::dispatch($user);
-            \App\Jobs\CalculateCompatibilityMatches::dispatch($user);
-        } else {
-            Log::warning('Usuario ' . $user->id . ' no tiene coordenadas para calcular distancias o compatibilidad por proximidad.');
-        }
-    }
-
-    // Pasar el usuario, el signo lunar, el signo ascendente y las imágenes a la vista 'astromatch'
-    return view('astromatch', compact('user', 'lunarSign', 'ascendantSign'));
-})->name('astromatch')->middleware('auth');
+// ¡MODIFICADO! Ahora apunta al controlador AstrologicalUserController@showAstromatch
+Route::get('/astromatch', [AstrologicalUserController::class, 'showAstromatch'])->name('astromatch')->middleware('auth');
 
 
 Route::post('/register', [AstrologicalUserController::class, 'register'])->name('register.submit');
@@ -113,6 +80,9 @@ Route::middleware('auth')->group(function () {
     // NUEVAS RUTAS PARA IMÁGENES DE PERFIL ADICIONALES
     Route::post('/profile/images/upload', [ProfileImageController::class, 'uploadImage'])->name('profile.images.upload');
     Route::delete('/profile/images/{id}', [ProfileImageController::class, 'deleteImage'])->name('profile.images.delete');
+
+    // ¡NUEVO! Ruta para actualizar los tags del usuario
+    Route::post('/profile/tags/update', [AstrologicalUserController::class, 'updateUserTags'])->name('profile.tags.update');
 });
 
 Route::middleware('auth')->group(function () {
