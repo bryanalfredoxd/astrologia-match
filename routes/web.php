@@ -29,10 +29,22 @@ Route::post('/login', [AuthController::class, 'login']);
 // Ruta de cierre de sesión
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Ruta protegida (requiere autenticación)
-// ¡MODIFICADO! Ahora apunta al controlador AstrologicalUserController@showAstromatch
-Route::get('/astromatch', [AstrologicalUserController::class, 'showAstromatch'])->name('astromatch')->middleware('auth');
-
+// JOBS - Procesos en segundo plano
+Route::get('/astromatch', function () {
+    $user = Auth::user();
+    
+    if ($user instanceof AstrologicalUser) {
+        $user->load('datosAstralesBasicos.signoSolar');
+        
+        if (!is_null($user->latitud) && !is_null($user->longitud)) {
+            CalculateUserDistances::dispatch($user);
+            CalculateCompatibilityMatches::dispatch($user);
+        } else {
+            Log::warning("Usuario {$user->id} sin coordenadas");
+        }
+    }
+    return app(AstrologicalUserController::class)->showAstromatch();
+})->name('astromatch')->middleware('auth');
 
 Route::post('/register', [AstrologicalUserController::class, 'register'])->name('register.submit');
 
@@ -112,3 +124,4 @@ Route::middleware('auth')->group(function () {
         return view('matched_profile', compact('user'));
     })->name('matched.profile');
 });
+

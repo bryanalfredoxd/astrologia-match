@@ -62,7 +62,7 @@
         #lottie-animation {
             width: 300px;
             height: 300px;
-            background: white;
+            background: rgb(255, 255, 255);
             border-radius: 50%;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             display: flex;
