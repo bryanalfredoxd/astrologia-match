@@ -3,14 +3,15 @@ var filesToCache = [
     '/offline',
     '/css/app.css',
     '/js/app.js',
-    '/images/icons/icon-72x72.webp',
-    '/images/icons/icon-96x96.webp',
-    '/images/icons/icon-128x128.webp',
-    '/images/icons/icon-144x144.webp',
-    '/images/icons/icon-152x152.webp',
-    '/images/icons/icon-192x192.webp',
-    '/images/icons/icon-384x384.webp',
-    '/images/icons/icon-512x512.webp',
+    '/images/icons/Logo_Astromatch48.png',
+    '/images/icons/Logo_Astromatch72.png',
+    '/images/icons/Logo_Astromatch96.png',
+    '/images/icons/Logo_Astromatch128.png',
+    '/images/icons/Logo_Astromatch144.png',
+    '/images/icons/Logo_Astromatch152.png',
+    '/images/icons/Logo_Astromatch192.png',
+    '/images/icons/Logo_Astromatch384.png',
+    '/images/icons/Logo_Astromatch512.png',
 ];
 
 // Cache on install
