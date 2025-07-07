@@ -106,6 +106,7 @@
                         <h3 class="text-xl font-semibold text-[#FFD700] flex items-center mb-3 border-b border-[#FFD700] border-opacity-50 pb-2">
                             <i class="fas fa-user-circle mr-3 text-[#F8C800]"></i> Información Personal
                         </h3>
+                        {{-- Campo Nombre Completo --}}
                         <div>
                             <label for="nombre_completo" class="block text-[#A7B3EB] text-sm font-medium mb-1">Nombre completo</label>
                             <div class="relative">
@@ -115,10 +116,10 @@
                                 <input id="nombre_completo" type="text" name="nombre_completo" required autocomplete="name"
                                     class="w-full pl-10 pr-3 py-2 bg-white bg-opacity-15 border border-[#4A0E7B] border-opacity-40 rounded-lg text-white placeholder-[#D6E3FF] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition duration-200 ease-in-out @error('nombre_completo') border-red-500 @enderror"
                                     placeholder="Tu nombre completo">
-                                @error('nombre_completo')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                @enderror
                             </div>
+                            @error('nombre_completo')
+                                <p class="text-red-500 text-xs mt-1 pl-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         
                         <div>
@@ -157,6 +158,7 @@
                             <i class="fas fa-star-of-life mr-3 text-[#F8C800]"></i> Datos Astrológicos
                         </h3>
                         
+                        {{-- Campo Fecha de Nacimiento --}}
                         <div>
                             <label for="fecha_nacimiento" class="block text-[#A7B3EB] text-sm font-medium mb-1">Fecha de nacimiento</label>
                             <div class="relative">
@@ -165,10 +167,10 @@
                                 </div>
                                 <input id="fecha_nacimiento" type="date" name="fecha_nacimiento" required
                                     class="w-full pl-10 pr-3 py-2 bg-white bg-opacity-15 border border-[#4A0E7B] border-opacity-40 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition duration-200 ease-in-out appearance-none date-input @error('fecha_nacimiento') border-red-500 @enderror">
-                                @error('fecha_nacimiento')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                @enderror
                             </div>
+                            @error('fecha_nacimiento')
+                                <p class="text-red-500 text-xs mt-1 pl-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         
                         <div>
@@ -196,62 +198,29 @@
                                     class="w-full pl-10 pr-3 py-2 bg-white bg-opacity-15 border border-[#4A0E7B] border-opacity-40 rounded-lg text-white placeholder-[#D6E3FF] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition duration-200 ease-in-out @error('lugar_nacimiento') border-red-500 @enderror"
                                     placeholder="Escribe o selecciona tu ciudad">
                                 <datalist id="ciudades_venezuela">
-                                    <option value="Caracas">
-                                    <option value="Maracaibo">
-                                    <option value="Valencia">
-                                    <option value="Barquisimeto">
-                                    <option value="Maracay">
-                                    <option value="Ciudad Guayana">
-                                    <option value="San Cristóbal">
-                                    <option value="Maturín">
-                                    <option value="Barcelona">
-                                    <option value="Puerto La Cruz">
-                                    <option value="Mérida">
-                                    <option value="Cumana">
-                                    <option value="Coro">
+                                    <option value="Amazonas">
+                                    <option value="Anzoátegui">
+                                    <option value="Apure">
+                                    <option value="Aragua">
                                     <option value="Barinas">
-                                    <option value="Cabimas">
-                                    <option value="Punto Fijo">
-                                    <option value="La Guaira">
-                                    <option value="Cumaná">
-                                    <option value="Ciudad Bolívar">
-                                    <option value="Valera">
-                                    <option value="Los Teques">
-                                    <option value="Guarenas">
-                                    <option value="Guatire">
-                                    <option value="Acarigua">
-                                    <option value="Araure">
-                                    <option value="El Tigre">
-                                    <option value="San Fernando de Apure">
-                                    <option value="Puerto Cabello">
-                                    <option value="Anaco">
-                                    <option value="Calabozo">
-                                    <option value="Ejido">
-                                    <option value="Charallave">
-                                    <option value="Ocumare del Tuy">
-                                    <option value="Cúa">
-                                    <option value="San Felipe">
-                                    <option value="Tinaquillo">
-                                    <option value="Quíbor">
-                                    <option value="Upata">
-                                    <option value="Carúpano">
-                                    <option value="San Carlos">
-                                    <option value="Tucupita">
-                                    <option value="San Juan de los Morros">
-                                    <option value="La Victoria">
-                                    <option value="Villa de Cura">
-                                    <option value="Chivacoa">
-                                    <option value="Zaraza">
-                                    <option value="Machiques">
-                                    <option value="Santa Rita">
-                                    <option value="Machiques de Perijá">
-                                    <option value="Puerto Ayacucho">
-                                    <option value="Guasdualito">
-                                    <option value="Bocono">
-                                    <option value="San Antonio del Táchira">
-                                    <option value="Rubio">
-                                    <option value="Colon">
-                                    <option value="Santa Elena de Uairén">
+                                    <option value="Bolívar">
+                                    <option value="Carabobo">
+                                    <option value="Caracas">
+                                    <option value="Cojedes">
+                                    <option value="Delta Amacuro">
+                                    <option value="Falcón">
+                                    <option value="Guárico">
+                                    <option value="Lara">
+                                    <option value="Mérida">
+                                    <option value="Miranda">
+                                    <option value="Monagas">
+                                    <option value="Nueva Esparta">
+                                    <option value="Portuguesa">
+                                    <option value="Sucre">
+                                    <option value="Táchira">
+                                    <option value="Trujillo">
+                                    <option value="Yaracuy">
+                                    <option value="Zulia">
                                 </datalist>
                             </div>
                             <p class="text-xs text-[#A7B3EB] mt-1">Para calcular tu ascendente con precisión</p>

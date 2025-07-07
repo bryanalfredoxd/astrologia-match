@@ -6,8 +6,8 @@ use App\Models\AstrologicalUser;
 use App\Models\SignoZodiacal;
 use App\Models\DatosAstralesBasicos;
 use App\Models\GroqAstrologyData;
-use App\Models\TagMaestro; // Import the TagMaestro model
-use App\Models\UsuarioTag; // Import the UsuarioTag model
+use App\Models\TagMaestro;
+use App\Models\UsuarioTag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB; // For database transactions
+use Illuminate\Validation\Rule; // Importar Rule para validaciones más complejas
 
 class AstrologicalUserController extends Controller
 {
@@ -22,15 +23,29 @@ class AstrologicalUserController extends Controller
     {
         // Validación de los datos del formulario
         $validatedData = $request->validate([
-            'nombre_completo' => 'required|string|max:255',
+            // Nombre Completo: solo letras y espacios, máximo 255 caracteres
+            'nombre_completo' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/'],
+            // Correo electrónico: formato de email, único en la tabla astrological_users
             'email' => 'required|string|email|max:255|unique:astrological_users',
+            // Contraseña: mínimo 8 caracteres
             'password' => 'required|string|min:8',
-            'fecha_nacimiento' => 'required|date',
+            // Fecha de nacimiento: debe ser una fecha, no menor de 18 años ni mayor de 100 años
+            'fecha_nacimiento' => [
+                'required',
+                'date',
+                'before_or_equal:' . Carbon::now()->subYears(18)->format('Y-m-d'), // No menor de 18 años
+                'after_or_equal:' . Carbon::now()->subYears(100)->format('Y-m-d'), // No mayor de 100 años
+            ],
             'hora_nacimiento' => 'required',
             'lugar_nacimiento' => 'required|string|max:255',
             'genero' => 'required|string|in:Masculino,Femenino',
             'orientacion_sexual' => 'required|string|in:Heterosexual,Homosexual,Bisexual,Pansexual,Asexual',
             'terminos_condiciones' => 'required|accepted'
+        ], [
+            // Mensajes personalizados para las validaciones
+            'nombre_completo.regex' => 'El nombre completo solo debe contener letras y espacios.',
+            'fecha_nacimiento.before_or_equal' => 'Debes tener al menos 18 años para registrarte.',
+            'fecha_nacimiento.after_or_equal' => 'La edad máxima permitida para el registro es de 100 años.',
         ]);
 
         // Obtener la ciudad del input y concatenar el país
@@ -67,9 +82,6 @@ class AstrologicalUserController extends Controller
             // Opcional: manejar el error, como devolver un mensaje al usuario o lanzar una excepción.
         }
 
-        // Aquí podrías crear un registro en groq_astrology_data si es necesario,
-        // aunque es nullable y podrías llenarlo más tarde.
-        // Si quieres crearlo vacío al registrar el usuario:
         GroqAstrologyData::create([
             'user_id' => $user->id,
             // 'signo_lunar_id' y 'signo_ascendente_id' son nullable, se pueden dejar vacíos
@@ -150,10 +162,16 @@ class AstrologicalUserController extends Controller
     {
         /** @var \App\Models\AstrologicalUser $user */
         $user = Auth::user();
-        
+
         $validated = $request->validate([
             'nombre_completo' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:astrological_users,email,'.$user->id,
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('astrological_users')->ignore($user->id),
+            ],
             'password' => 'nullable|string|min:8|confirmed',
             'genero' => 'required|string|max:50',
             'orientacion_sexual' => 'required|string|max:50',
@@ -244,13 +262,6 @@ class AstrologicalUserController extends Controller
             $q->where('id_signo_solar', $signoId);
         });
 
-        // 2. Filtrar por género y "busca"
-        // Si el usuario busca hombres, y su orientación es homosexual o bisexual, busca hombres.
-        // Si el usuario busca mujeres, y su orientación es heterosexual o bisexual, busca mujeres.
-        // Si el usuario busca ambos, entonces busca hombres y mujeres.
-
-        // Convertir los valores de 'genero' y 'busca' a los que están en la base de datos
-        // Asumiendo que en DB 'genero' es 'Masculino' o 'Femenino' (capitalizado)
         $generoDB = ($generoUsuario === 'masculino') ? 'Masculino' : 'Femenino';
 
         // Lógica para 'busca':
@@ -259,55 +270,16 @@ class AstrologicalUserController extends Controller
         } elseif ($buscaGenero === 'mujeres') {
             $query->where('genero', 'Femenino');
         }
-        // Si busca 'ambos', no filtramos por género aquí, ya que incluimos ambos.
-
-        // 3. Filtrar por orientación sexual del usuario compatible
-        // Aquí la lógica puede ser más compleja y depender de cómo defines la compatibilidad.
-        // Por ejemplo, un heterosexual busca heterosexuales del género opuesto.
-        // Un homosexual busca homosexuales del mismo género.
-        // Un bisexual puede buscar de ambas orientaciones.
-
-        // Por simplicidad, solo filtramos por la orientación sexual del 'target'
-        // que es compatible con la orientación y búsqueda del usuario.
-
-        // Ejemplo simple: Si el usuario es heterosexual y busca mujeres, la mujer debe ser heterosexual o bisexual.
-        // Esto es una simplificación, la compatibilidad sexual real es más matizada.
-
-        // Para esta implementación básica, vamos a buscar usuarios que se "buscan" mutuamente
-        // o que su orientación los hace compatibles con la búsqueda del otro.
-
-        // Por ahora, solo usaremos los parámetros del formulario para buscar usuarios con esas características.
-        // Por ejemplo, si el usuario es "masculino", "heterosexual" y busca "mujeres" de "Aries" de "25" años:
-        // Buscamos mujeres, que sean Aries, y con una edad cercana.
-
-        // La siguiente parte asume que queremos encontrar usuarios que coincidan con la *descripción* del perfil
-        // que el usuario está buscando. No es una compatibilidad mutua.
-        // Si quiero buscar a hombres:
-        // $query->where('genero', 'Masculino');
-        // $query->where('orientacion_sexual', 'Heterosexual'); // (Si el que busca es mujer)
-        // $query->where('orientacion_sexual', 'Homosexual'); // (Si el que busca es hombre)
-        // Esto es donde se complica la lógica de emparejamiento real.
-
-        // Para este ejercicio, vamos a buscar usuarios que *coincidan con los criterios deseados por el que busca*.
-        // Por ejemplo, si el usuario dice que "busca" "hombres", filtraremos por 'genero' = 'Masculino'.
-        // Si el usuario dice que su 'orientacion' es 'heterosexual' y 'busca' 'mujeres',
-        // entonces buscaremos mujeres cuya 'orientacion_sexual' sea 'heterosexual' o 'bisexual'.
 
         // Si 'busca' es 'hombres':
         if ($buscaGenero === 'hombres') {
             $query->where('genero', 'Masculino');
-            // Si el usuario es heterosexual y busca hombres, no es compatible con hombres heterosexuales.
-            // Si el usuario es homosexual y busca hombres, busca hombres homosexuales o bisexuales.
             if ($orientacionUsuario === 'homosexual') {
                 $query->whereIn('orientacion_sexual', ['Homosexual', 'Bisexual', 'Pansexual']);
             } elseif ($orientacionUsuario === 'bisexual') {
                 // Un bisexual que busca hombres, puede buscar homosexuales o bisexuales
                  $query->whereIn('orientacion_sexual', ['Homosexual', 'Bisexual', 'Pansexual']);
             } else { // Heterosexual o Asexual buscando hombres (menos común en apps de citas, pero posible)
-                 // Puedes decidir si los heterosexuales buscan hombres (serían mujeres)
-                 // o si es un error lógico para la búsqueda.
-                 // Para un hombre heterosexual buscando hombres, no habría compatibilidad.
-                 // Para una mujer heterosexual buscando hombres, buscariamos hombres heterosexuales o bisexuales.
                 if ($generoUsuario === 'femenino') { // Una mujer heterosexual buscando hombres
                      $query->whereIn('orientacion_sexual', ['Heterosexual', 'Bisexual', 'Pansexual']);
                 }
@@ -330,14 +302,9 @@ class AstrologicalUserController extends Controller
         }
         // Si 'busca' es 'ambos':
         elseif ($buscaGenero === 'ambos') {
-            // Si el usuario es heterosexual, busca el género opuesto con orientaciones compatibles.
-            // Si el usuario es homosexual, busca el mismo género con orientaciones compatibles.
-            // Si el usuario es bisexual, busca ambos géneros con orientaciones compatibles.
 
             $query->where(function ($q) use ($generoUsuario, $orientacionUsuario) {
                 if ($orientacionUsuario === 'heterosexual') {
-                    // Si el usuario es hombre heterosexual, busca mujeres heterosexuales/bisexuales.
-                    // Si el usuario es mujer heterosexual, busca hombres heterosexuales/bisexuales.
                     if ($generoUsuario === 'masculino') { // Hombre heterosexual busca mujeres
                         $q->where('genero', 'Femenino')
                           ->whereIn('orientacion_sexual', ['Heterosexual', 'Bisexual', 'Pansexual']);
@@ -346,8 +313,6 @@ class AstrologicalUserController extends Controller
                           ->whereIn('orientacion_sexual', ['Heterosexual', 'Bisexual', 'Pansexual']);
                     }
                 } elseif ($orientacionUsuario === 'homosexual') {
-                    // Si el usuario es hombre homosexual, busca hombres homosexuales/bisexuales.
-                    // Si el usuario es mujer homosexual, busca mujeres homosexuales/bisexuales.
                     if ($generoUsuario === 'masculino') { // Hombre homosexual busca hombres
                         $q->where('genero', 'Masculino')
                           ->whereIn('orientacion_sexual', ['Homosexual', 'Bisexual', 'Pansexual']);
