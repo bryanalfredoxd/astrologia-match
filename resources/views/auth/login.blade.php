@@ -207,7 +207,7 @@
                             <label for="remember_me" class="ml-2 block text-sm text-[#E0E7FF]">Recordar sesión</label>
                         </div>
                         <div class="text-sm">
-                            <a href="#" class="font-medium text-[#FFD700] hover:text-[#F8C800] transition">¿Olvidaste tu contraseña?</a>
+                            <a href="{{ route('password.request') }}" class="font-medium text-[#FFD700] hover:text-[#F8C800] transition">¿Olvidaste tu contraseña?</a>
                         </div>
                     </div>
 

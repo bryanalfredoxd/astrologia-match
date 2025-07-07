@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\ProfileImageController; // Importar el controlador de imágenes
 use App\Models\TagMaestro;
+use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
 
 // Página principal con splash screen
 Route::get('/', function () {
@@ -125,3 +127,9 @@ Route::middleware('auth')->group(function () {
     })->name('matched.profile');
 });
 
+// Rutas de autenticación
+// Password Reset Routes
+Route::get('/forgot-password', [PasswordResetController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.update');

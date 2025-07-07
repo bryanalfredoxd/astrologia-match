@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Notifications\ResetPasswordNotification;
 
-class AstrologicalUser extends Authenticatable
+class AstrologicalUser extends Authenticatable implements CanResetPassword
 {
     use HasFactory, Notifiable;
 
@@ -144,5 +146,10 @@ class AstrologicalUser extends Authenticatable
         }
 
         return (int) round(($completedCount / $totalFields) * 100);
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
     }
 }
