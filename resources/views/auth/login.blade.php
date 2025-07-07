@@ -167,10 +167,10 @@
                     <h1 class="text-2xl md:text-3xl font-bold text-[#FFD700] mb-2">Bienvenido de vuelta</h1>
                     <p class="text-[#E0E7FF] text-sm">Ingresa tus datos para continuar tu viaje astral</p>
                 </div>
-
+        
                 <form method="POST" action="{{ route('login') }}" class="space-y-6">
                     @csrf
-
+        
                     <div>
                         <label for="email" class="block text-[#E0E7FF] text-sm font-medium mb-2">Correo electrónico</label>
                         <div class="relative">
@@ -185,7 +185,7 @@
                             @enderror
                         </div>
                     </div>
-
+        
                     <div>
                         <label for="password" class="block text-[#E0E7FF] text-sm font-medium mb-2">Contraseña</label>
                         <div class="relative">
@@ -200,9 +200,10 @@
                             @enderror
                         </div>
                     </div>
-
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
-                        <div class="flex items-center mb-3 sm:mb-0">
+        
+                    <!-- Sección modificada para centrado responsive -->
+                    <div class="flex flex-col items-center space-y-3 sm:flex-row sm:space-y-0 sm:justify-between">
+                        <div class="flex items-center">
                             <input id="remember_me" name="remember" type="checkbox" class="h-4 w-4 text-[#FFD700] focus:ring-[#FFD700] border-[#4A0E7B] rounded bg-[#1A1F3D]">
                             <label for="remember_me" class="ml-2 block text-sm text-[#E0E7FF]">Recordar sesión</label>
                         </div>
@@ -210,12 +211,12 @@
                             <a href="{{ route('password.request') }}" class="font-medium text-[#FFD700] hover:text-[#F8C800] transition">¿Olvidaste tu contraseña?</a>
                         </div>
                     </div>
-
+        
                     <button type="submit" class="w-full flex justify-center items-center px-6 py-3 bg-gradient-to-r from-[#FFD700] to-[#F8C800] text-[#0A0E2A] font-bold rounded-full transition duration-300 hover:shadow-lg hover:shadow-[#FFD700]/30 mt-6">
                         <i class="fas fa-door-open mr-2"></i> Iniciar Sesión
                     </button>
                 </form>
-
+        
                 <div class="text-center pt-6 mt-6 border-t border-[#4A0E7B]/40">
                     <p class="text-[#E0E7FF] text-sm">¿No tienes una cuenta?
                         <a href="{{ route('register') }}" class="text-[#FFD700] hover:text-[#F8C800] font-semibold transition underline">Regístrate aquí</a>

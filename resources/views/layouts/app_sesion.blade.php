@@ -34,10 +34,31 @@
     <style>
 
         * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Prevenir selección de texto en toda la aplicación */
+        body {
+            -webkit-user-select: none; /* Safari/Chrome */
+            -moz-user-select: none;    /* Firefox */
+            -ms-user-select: none;     /* IE/Edge */
+            user-select: none;         /* Estándar */
+        }
+
+        img {
+            pointer-events: none;
+            -webkit-touch-callout: none;
+        }
+
+        /* Excepciones para campos de entrada y áreas editables */
+        input, textarea, [contenteditable="true"] {
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+            user-select: text !important;
+        }
 
         /* Añadir estos estilos para prevenir layout shifts y flashes */
         html, body {

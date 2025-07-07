@@ -85,17 +85,86 @@
 
     @include('others.signos_zodiacales')
 
-    <!-- CTA optimizado para móviles -->
+    <!-- CTA optimizado para móviles con opción de instalación PWA -->
     <section class="py-8 md:py-16 bg-astral text-white">
         <div class="container mx-auto px-4 text-center">
             <h2 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6">¿Listo para tu conexión cósmica?</h2>
             <p class="text-base md:text-xl mb-6 md:mb-8 max-w-2xl mx-auto">
                 <i class="fas fa-map-marker-alt mr-2"></i> Encuentra personas compatibles según los astros cerca de ti.
             </p>
-            <a href="{{ route('register') }}" class="cta-button inline-block px-6 py-3 md:px-8 md:py-4 bg-yellow-400 text-blue-900 font-bold rounded-full hover:bg-yellow-300 text-sm md:text-lg flex items-center justify-center mx-auto w-max">
-                <i class="fas fa-rocket mr-2"></i> Comenzar ahora
-            </a>
+            
+            <div class="flex flex-col sm:flex-row justify-center gap-4 max-w-md mx-auto">
+                <!-- Botón de registro principal -->
+                <a href="{{ route('register') }}" class="cta-button px-6 py-3 md:px-8 md:py-4 bg-yellow-400 text-blue-900 font-bold rounded-full hover:bg-yellow-300 text-sm md:text-lg flex items-center justify-center">
+                    <i class="fas fa-rocket mr-2"></i> Comenzar ahora
+                </a>
+                
+                <!-- Botón de instalación PWA (oculto inicialmente) - Ahora como <a> -->
+                <a id="pwa-cta-install" href="#" class="cta-button px-6 py-3 md:px-8 md:py-4 bg-yellow-400 text-blue-900 font-bold rounded-full hover:bg-yellow-300 text-sm md:text-lg flex items-center justify-center">
+                    <i class="fas fa-download mr-2"></i> Instalar App
+                </a>
+            </div>
+            
+            <!-- Mensaje para usuarios que ya tienen la PWA instalada -->
+            <p id="pwa-installed-message" class="hidden mt-4 text-yellow-300 text-sm">
+                <i class="fas fa-check-circle mr-1"></i> Ya tienes la app instalada
+            </p>
         </div>
     </section>
+
+    <script>
+        // Botón de instalación PWA en el CTA
+        const pwaCtaInstall = document.getElementById('pwa-cta-install');
+        const pwaInstalledMessage = document.getElementById('pwa-installed-message');
+
+        // Mostrar u ocultar el botón de instalación según corresponda
+        function updatePwaInstallButton() {
+            if (isPwaInstalled()) {
+                pwaCtaInstall.classList.add('hidden');
+                pwaInstalledMessage.classList.remove('hidden');
+            } else if (deferredPrompt) {
+                pwaCtaInstall.classList.remove('hidden');
+                pwaInstalledMessage.classList.add('hidden');
+            } else {
+                pwaCtaInstall.classList.add('hidden');
+                pwaInstalledMessage.classList.add('hidden');
+            }
+        }
+
+        // Evento para instalar desde el CTA
+        if (pwaCtaInstall) {
+            pwaCtaInstall.addEventListener('click', async (e) => {
+                e.preventDefault(); // Prevenir el comportamiento normal del enlace
+                
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        pwaCtaInstall.classList.add('hidden');
+                        pwaInstalledMessage.classList.remove('hidden');
+                    }
+                    deferredPrompt = null;
+                }
+            });
+        }
+
+        // Actualizar el estado del botón cuando cambie
+        window.addEventListener('appinstalled', () => {
+            pwaCtaInstall.classList.add('hidden');
+            pwaInstalledMessage.classList.remove('hidden');
+        });
+
+        // Actualizar el botón cuando se recibe el evento beforeinstallprompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            updatePwaInstallButton();
+        });
+
+        // Verificar estado al cargar
+        window.addEventListener('load', () => {
+            setTimeout(updatePwaInstallButton, 1000);
+        });
+    </script>
 
 @endsection
