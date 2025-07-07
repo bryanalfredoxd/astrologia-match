@@ -73,15 +73,7 @@
                 </select>
             </div>
 
-            {{-- Tags --}}
-            <div>
-                <label class="block text-lg font-semibold text-white mb-2">Tags de Interés:</label>
-                <div id="tagsContainer" class="space-y-4 bg-gray-800 p-4 rounded-xl border border-[#FFD700]/30 max-h-60 overflow-y-auto custom-scrollbar">
-                    {{-- Tags cargados dinámicamente --}}
-                    <p class="text-white/70">Cargando tags...</p>
-                </div>
-            </div>
-
+            {{-- Botones de acción --}}
             <div class="flex justify-between mt-8 pt-4 border-t border-white/10">
                 <button type="button" id="resetFiltersBtn" class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-full transition duration-300 transform hover:scale-105 shadow-lg">
                     Limpiar Filtros
@@ -91,7 +83,7 @@
                 </button>
             </div>
         </form>
-        
+
         <!-- Espacio adicional solo para móviles -->
         <div class="block sm:hidden h-5"></div>
     </div>
@@ -108,10 +100,8 @@
             <img id="matchUserAvatar" src="" alt="Match Avatar" class="w-36 h-36 sm:w-48 sm:h-48 rounded-full mx-auto mb-8 border-5 border-[#FFD700] shadow-xl object-cover ring-4 ring-[#8A2BE2]/50">
 
             <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <a href="#" id="viewProfileBtn" class="inline-flex items-center justify-center px-8 py-4 bg-[#FFD700] hover:bg-[#F8C800] text-[#0A0E2A] font-extrabold rounded-full transition duration-300 transform hover:scale-105 shadow-lg text-lg">
-                    <i class="fas fa-user-circle mr-3"></i> Ver Perfil
-                </a>
-                <a href="#" class="inline-flex items-center justify-center px-8 py-4 bg-[#8A2BE2] hover:bg-[#7a1fd1] text-white font-extrabold rounded-full transition duration-300 transform hover:scale-105 shadow-lg text-lg mt-3 sm:mt-0">
+                {{-- Botón "Ver Perfil" eliminado --}}
+                <a href="{{ route('chat') }}" id="goToChatBtn" class="inline-flex items-center justify-center px-8 py-4 bg-[#8A2BE2] hover:bg-[#7a1fd1] text-white font-extrabold rounded-full transition duration-300 transform hover:scale-105 shadow-lg text-lg mt-3 sm:mt-0">
                     <i class="fas fa-comments mr-3"></i> Ir al Chat
                 </a>
             </div>
@@ -266,7 +256,8 @@
         const matchModal = document.getElementById('matchModal');
         const matchUserName = document.getElementById('matchUserName');
         const matchUserAvatar = document.getElementById('matchUserAvatar');
-        const viewProfileBtn = document.getElementById('viewProfileBtn');
+        // const viewProfileBtn = document.getElementById('viewProfileBtn'); // Eliminado
+        const goToChatBtn = document.getElementById('goToChatBtn'); // Nuevo: Referencia al botón "Ir al Chat"
         const closeMatchModalX = document.getElementById('closeMatchModalX');
 
         // Elements for image lightbox
@@ -282,7 +273,7 @@
         const filterForm = document.getElementById('filterForm');
         const generoFilterSelect = document.getElementById('genero_filter');
         const orientacionSexualFilterSelect = document.getElementById('orientacion_sexual_filter');
-        const tagsContainer = document.getElementById('tagsContainer');
+        // const tagsContainer = document.getElementById('tagsContainer'); // Eliminado
         const ageMinInput = document.getElementById('age_min');
         const ageMaxInput = document.getElementById('age_max');
         const resetFiltersBtn = document.getElementById('resetFiltersBtn');
@@ -294,7 +285,8 @@
         let currentFilters = {}; // To store the applied filters
 
         /**
-         * Fetches filter options (genres, orientations, tags) from the API and populates the filter modal.
+         * Fetches filter options (genres, orientations) from the API and populates the filter modal.
+         * Se ha eliminado la lógica de tags.
          */
         async function fetchFilterOptions() {
             try {
@@ -322,41 +314,12 @@
                     orientacionSexualFilterSelect.appendChild(option);
                 });
 
-                // Populate Tags
-                tagsContainer.innerHTML = ''; // Clear loading message
-                if (Object.keys(data.tags).length > 0) {
-                    for (const category in data.tags) {
-                        const categoryDiv = document.createElement('div');
-                        categoryDiv.className = 'mb-3';
-                        categoryDiv.innerHTML = `<h4 class="font-bold text-[#FFD700] mb-2">${category}:</h4>`;
-                        const tagsListDiv = document.createElement('div');
-                        tagsListDiv.className = 'flex flex-wrap gap-2';
-
-                        data.tags[category].forEach(tag => {
-                            const tagId = `tag-${tag.id_tag}`;
-                            const checkboxHtml = `
-                                <input type="checkbox" id="${tagId}" name="tag_ids[]" value="${tag.id_tag}" class="hidden peer">
-                                <label for="${tagId}" class="inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium border border-gray-600 text-gray-300 bg-gray-700 cursor-pointer transition-all duration-200 ease-in-out
-                                    peer-checked:bg-[#FFD700] peer-checked:text-[#0A0E2A] peer-checked:border-[#FFD700] peer-checked:shadow-md
-                                    hover:bg-gray-600 hover:text-white">
-                                    ${tag.nombre_tag}
-                                </label>
-                            `;
-                            tagsListDiv.innerHTML += checkboxHtml;
-                        });
-                        categoryDiv.appendChild(tagsListDiv);
-                        tagsContainer.appendChild(categoryDiv);
-                    }
-                } else {
-                    tagsContainer.innerHTML = '<p class="text-white/70">No hay tags disponibles.</p>';
-                }
-
                 // Restore selected filters if any
                 applyCurrentFiltersToForm();
 
             } catch (error) {
                 console.error('Error fetching filter options:', error);
-                tagsContainer.innerHTML = '<p class="text-red-400">Error al cargar filtros. Intenta de nuevo más tarde.</p>';
+                // No tagsContainer to update anymore
             }
         }
 
@@ -734,7 +697,7 @@
             matchUserName.textContent = userName;
             // Use placeholder if no URL or if URL is null/empty
             matchUserAvatar.src = userAvatarUrl ? `{{ asset('${userAvatarUrl}') }}` : `https://placehold.co/180x180/4A0E7B/FFFFFF?text=MATCH`;
-            viewProfileBtn.href = `{{ url('/matched-profile') }}/${userId}`; // Set href for 'Ver Perfil' button
+            goToChatBtn.href = `{{ url('/chat') }}`; // Set href for 'Ir al Chat' button
             matchModal.classList.remove('hidden');
             // Add animation classes
             matchModal.classList.add('animate-fade-in');
@@ -751,17 +714,6 @@
             currentMatchIndex++;
             displayCurrentMatch();
         });
-
-        // Close modal if clicking outside the content (optional, uncomment if desired)
-        // matchModal.addEventListener('click', function(event) {
-        //     if (event.target === matchModal) {
-        //         matchModal.classList.add('hidden');
-        //         matchModal.classList.remove('animate-fade-in');
-        //         matchModal.querySelector('div').classList.remove('animate-scale-in');
-        //         currentMatchIndex++;
-        //         displayCurrentMatch();
-        //     }
-        // });
 
         // Lightbox functionality
         function showLightbox(imageUrl) {
@@ -828,14 +780,7 @@
             const orientacionSexual = formData.get('orientacion_sexual');
             if (orientacionSexual) filters.orientacion_sexual = orientacionSexual;
 
-            // Get selected tags
-            const selectedTags = [];
-            filterForm.querySelectorAll('input[name="tag_ids[]"]:checked').forEach(checkbox => {
-                selectedTags.push(checkbox.value);
-            });
-            if (selectedTags.length > 0) {
-                filters.tag_ids = selectedTags;
-            }
+            // Se ha eliminado la lógica de tags
 
             currentFilters = filters; // Store current filters
             fetchMatches(currentFilters); // Fetch matches with new filters
@@ -851,6 +796,7 @@
 
         /**
          * Applies the currently stored filters to the form elements when the modal opens.
+         * Se ha eliminado la lógica de tags.
          */
         function applyCurrentFiltersToForm() {
             if (currentFilters.age_min) ageMinInput.value = currentFilters.age_min; else ageMinInput.value = '';
@@ -858,19 +804,7 @@
             if (currentFilters.genero) generoFilterSelect.value = currentFilters.genero; else generoFilterSelect.value = '';
             if (currentFilters.orientacion_sexual) orientacionSexualFilterSelect.value = currentFilters.orientacion_sexual; else orientacionSexualFilterSelect.value = '';
 
-            // Reset all tag checkboxes first
-            filterForm.querySelectorAll('input[name="tag_ids[]"]').forEach(checkbox => {
-                checkbox.checked = false;
-            });
-            // Check the ones that are in currentFilters.tag_ids
-            if (currentFilters.tag_ids && Array.isArray(currentFilters.tag_ids)) {
-                currentFilters.tag_ids.forEach(tagId => {
-                    const checkbox = document.getElementById(`tag-${tagId}`);
-                    if (checkbox) {
-                        checkbox.checked = true;
-                    }
-                });
-            }
+            // Se ha eliminado la lógica de tags
         }
 
 
